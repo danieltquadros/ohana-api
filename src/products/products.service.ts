@@ -55,14 +55,9 @@ export class ProductsService {
 
   // Atualizar um produto
   async update(id: number, updateProductDto: UpdateProductDto) {
-    const { ingredients, ...productData } = updateProductDto;
-
     return this.prisma.product.update({
       where: { id },
-      data: {
-        ...productData,
-        // Update de ingredientes é mais complexo, deixamos para depois
-      },
+      data: updateProductDto,
       include: {
         type: true,
         ingredients: true,

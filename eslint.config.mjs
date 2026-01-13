@@ -35,4 +35,11 @@ export default tseslint.config(
       'prettier/prettier': ['error', { endOfLine: 'auto' }],
     },
   },
+  // Configuração específica para arquivos de teste
+  {
+    files: ['**/*.spec.ts', '**/*.e2e-spec.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off', // Jest padrão usa métodos desvinculados
+    },
+  },
 );
