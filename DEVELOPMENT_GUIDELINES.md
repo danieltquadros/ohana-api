@@ -13,6 +13,7 @@
 
 - [ ] Estou desabilitando ESLint? (🚫 Repensar a solução)
 - [ ] Estou usando tipos corretos ou `any`?
+- [ ] **Estou usando `as any` para fazer compilar?** (🚫 NUNCA - encontre a solução correta)
 - [ ] O código segue os padrões do projeto?
 - [ ] Existe débito técnico sendo criado?
 

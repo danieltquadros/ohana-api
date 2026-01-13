@@ -55,9 +55,14 @@ export class ProductsService {
 
   // Atualizar um produto
   async update(id: number, updateProductDto: UpdateProductDto) {
+    // Separar ingredients do resto dos dados
+    // Update de ingredients é complexo (precisa delete + create), deixamos para depois
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { ingredients, ...productData } = updateProductDto;
+
     return this.prisma.product.update({
       where: { id },
-      data: updateProductDto,
+      data: productData,
       include: {
         type: true,
         ingredients: true,
