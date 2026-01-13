@@ -1,31 +1,321 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🍣 Ohana Sushi API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+[![CI Status](https://github.com/danieltquadros/ohana-api/actions/workflows/ci.yml/badge.svg)](https://github.com/danieltquadros/ohana-api/actions/workflows/ci.yml)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
+[![NestJS](https://img.shields.io/badge/NestJS-11.0-red.svg)](https://nestjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-7.2-teal.svg)](https://www.prisma.io/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+> Modern REST API for Ohana Sushi menu management system - Built with NestJS, Prisma 7, and PostgreSQL
 
-## Description
+**Status:** 🚧 Early Development - MVP in Progress
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## 📋 Table of Contents
+
+- [About](#about)
+- [Tech Stack](#tech-stack)
+- [Features](#features)
+- [Getting Started](#getting-started)
+- [Running Tests](#running-tests)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Development Guidelines](#development-guidelines)
+- [Roadmap](#roadmap)
+
+---
+
+## 🎯 About
+
+Ohana Sushi API is a modern, scalable REST API designed to manage a sushi restaurant's menu system. Built with enterprise-grade technologies and best practices, this project demonstrates:
+
+- ✅ Clean Architecture with dependency injection
+- ✅ Database-first design with Prisma ORM
+- ✅ Comprehensive unit testing (Jest)
+- ✅ Automated CI/CD pipeline
+- ✅ Type-safe development with TypeScript
+- ✅ Input validation and error handling
+
+**Project Origin:** Brazilian restaurant digitalization initiative
+
+---
+
+## 🚀 Tech Stack
+
+### Core Technologies
+
+- **[NestJS 11](https://nestjs.com/)** - Progressive Node.js framework
+- **[TypeScript 5.7](https://www.typescriptlang.org/)** - Type-safe JavaScript
+- **[Prisma 7](https://www.prisma.io/)** - Next-generation ORM
+- **[PostgreSQL](https://www.postgresql.org/)** - Production database (via Prisma Postgres)
+
+### Development & Quality
+
+- **[Jest](https://jestjs.io/)** - Testing framework
+- **[ESLint](https://eslint.org/)** - Code linting
+- **[Prettier](https://prettier.io/)** - Code formatting
+- **[GitHub Actions](https://github.com/features/actions)** - CI/CD automation
+- **[class-validator](https://github.com/typestack/class-validator)** - DTO validation
+
+---
+
+## ✨ Features
+
+### Implemented ✅
+
+- **Products Management**
+  - Full CRUD operations
+  - Rich product data (title, image, price, order)
+  - Ingredient relationships
+  - Product type categorization
+- **Product Types System**
+  - Dynamic product categories (database-driven)
+  - Previously enum-based, migrated to relational table for flexibility
+- **Data Validation**
+  - Input validation with DTOs
+  - Type safety throughout the application
+- **Testing Infrastructure**
+  - Unit tests for all service methods
+  - Mocked dependencies for isolated testing
+  - 9 tests passing (100% service coverage)
+- **CI/CD Pipeline**
+  - Automated testing on push/PR
+  - Linting and build verification
+  - Quality gates enforced
+
+### In Progress 🚧
+
+- E2E tests for API endpoints
+- GraphQL layer (alongside REST)
+- Authentication & authorization
+- Order management system
+
+---
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js 20.x or higher
+- npm or pnpm
+- PostgreSQL database (or use Prisma Postgres)
+
+### Installation
+
+1. **Clone the repository**
+
+   ```bash
+   git clone https://github.com/danieltquadros/ohana-api.git
+   cd ohana-api
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**
+
+   ```bash
+   # Create .env file
+   cp .env.example .env
+
+   # Add your database connection string
+   DATABASE_URL="your-postgresql-connection-string"
+   ```
+
+4. **Generate Prisma Client**
+
+   ```bash
+   npx prisma generate
+   ```
+
+5. **Run database migrations**
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+6. **Seed the database** (optional)
+
+   ```bash
+   npx prisma db seed
+   ```
+
+7. **Start the development server**
+   ```bash
+   npm run start:dev
+   ```
+
+The API will be available at `http://localhost:3000`
+
+---
+
+## 🧪 Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Watch mode
+npm run test:watch
+
+# Test coverage
+npm run test:cov
+
+# E2E tests
+npm run test:e2e
+```
+
+### Current Test Coverage
+
+- **Unit Tests:** 9 passing
+- **Coverage:** 100% of ProductsService methods
+- **Test Strategy:** Mock-based unit testing with Jest
+
+---
+
+## 📚 API Documentation
+
+### Base URL
+
+```
+http://localhost:3000
+```
+
+### Endpoints
+
+#### Products
+
+| Method | Endpoint        | Description                      |
+| ------ | --------------- | -------------------------------- |
+| GET    | `/products`     | List all products with relations |
+| GET    | `/products/:id` | Get product by ID                |
+| POST   | `/products`     | Create new product               |
+| PATCH  | `/products/:id` | Update product                   |
+| DELETE | `/products/:id` | Delete product                   |
+
+#### Example: Create Product
+
+```bash
+POST /products
+Content-Type: application/json
+
+{
+  "title": "Combo Salmão",
+  "image": "combo-salmao.jpg",
+  "price": 45.00,
+  "order": 1,
+  "productTypeId": 1,
+  "ingredients": [
+    { "name": "Salmão", "quantity": 10 },
+    { "name": "Cream Cheese", "quantity": 2 }
+  ]
+}
+```
+
+---
+
+## 📁 Project Structure
+
+```
+ohana-api/
+├── src/
+│   ├── prisma/           # Prisma service & module
+│   │   ├── prisma.service.ts
+│   │   └── prisma.module.ts
+│   ├── products/         # Products feature module
+│   │   ├── dto/          # Data Transfer Objects
+│   │   ├── entities/     # Domain entities
+│   │   ├── products.controller.ts
+│   │   ├── products.service.ts
+│   │   ├── products.module.ts
+│   │   └── *.spec.ts     # Unit tests
+│   ├── app.module.ts     # Root module
+│   └── main.ts           # Application entry point
+├── prisma/
+│   ├── schema.prisma     # Database schema
+│   ├── migrations/       # Migration history
+│   └── seed.ts           # Database seeding
+├── test/                 # E2E tests
+├── .github/
+│   └── workflows/
+│       └── ci.yml        # CI/CD pipeline
+├── DEVELOPMENT_GUIDELINES.md
+└── README.md
+```
+
+---
+
+## 📖 Development Guidelines
+
+This project follows strict development guidelines to ensure code quality, security, and maintainability. Key principles:
+
+- **No `as any` casts** - Type safety is non-negotiable
+- **Test-driven development** - Code and tests evolve together
+- **Security first** - Environment variables, no hardcoded secrets
+- **Production-ready from day one** - All code considers deployment
+
+See [DEVELOPMENT_GUIDELINES.md](DEVELOPMENT_GUIDELINES.md) for the complete guide.
+
+---
+
+## 🔮 Roadmap
+
+### Next Steps (Priority Order)
+
+1. **E2E Tests** - Complete API testing coverage
+2. **GraphQL Layer** - Add GraphQL alongside REST
+3. **Authentication** - JWT-based auth system
+4. **Order Management** - Shopping cart and order processing
+5. **Admin Panel** - Angular-based admin interface
+6. **Deployment** - Deploy to Render.com with CI/CD
+7. **Environment Separation** - Proper DEV/STAGING/PRD environments
+
+### Future Enhancements
+
+- Real-time updates with WebSockets
+- Image upload to cloud storage
+- Multi-language support
+- Analytics dashboard
+- Integration with payment gateways
+
+---
+
+## 🤝 Contributing
+
+This is a personal portfolio project, but feedback and suggestions are welcome! Feel free to:
+
+- Open issues for bugs or suggestions
+- Fork and experiment
+- Reach out with questions
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## 👤 Author
+
+**Daniel Quadros**
+
+- GitHub: [@danieltquadros](https://github.com/danieltquadros)
+- Project: [Ohana Sushi API](https://github.com/danieltquadros/ohana-api)
+
+---
+
+<div align="center">
+  
+**⭐ If you find this project interesting, please consider giving it a star!**
+
+Made with ❤️ using NestJS, Prisma, and TypeScript
+
+</div>
 
 ```bash
 $ npm install
