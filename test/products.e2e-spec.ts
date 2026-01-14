@@ -174,4 +174,81 @@ describe('ProductsController (e2e)', () => {
         .expect(400);
     });
   });
+
+  describe('PATCH /products/:id', () => {
+    it('should update a product', async () => {
+      const updateDto = {
+        title: 'Combo Atualizado',
+        price: 50.0,
+      };
+
+      const mockUpdatedProduct = {
+        id: 100,
+        title: 'Combo Atualizado',
+        image: 'combo-monstro.jpg',
+        price: 50.0,
+        order: 1,
+        productTypeId: 1,
+        createdAt: new Date('2026-01-14T00:30:39.000Z'),
+        updatedAt: new Date('2026-01-14T00:30:39.000Z'),
+        type: { id: 1, name: 'Combos', order: 1 },
+        ingredients: [],
+      };
+
+      jest
+        .spyOn(prisma.product, 'update')
+        .mockResolvedValue(mockUpdatedProduct as any);
+
+      const response = await request(app.getHttpServer())
+        .patch('/products/100')
+        .send(updateDto)
+        .expect(200);
+
+      expect(response.body).toEqual({
+        ...mockUpdatedProduct,
+        createdAt: mockUpdatedProduct.createdAt.toISOString(),
+        updatedAt: mockUpdatedProduct.updatedAt.toISOString(),
+      });
+    });
+
+    it('should return 400 for invalid data', async () => {
+      const invalidDto = {
+        price: 'not-a-number', // Deveria ser número
+      };
+
+      await request(app.getHttpServer())
+        .patch('/products/100')
+        .send(invalidDto)
+        .expect(400);
+    });
+  });
+
+  describe('DELETE /products/:id', () => {
+    it('should delete a product', async () => {
+      const mockDeletedProduct = {
+        id: 100,
+        title: 'Combo Monstro',
+        image: 'combo-monstro.jpg',
+        price: 45.0,
+        order: 1,
+        productTypeId: 1,
+        createdAt: new Date('2026-01-14T00:30:39.000Z'),
+        updatedAt: new Date('2026-01-14T00:30:39.000Z'),
+      };
+
+      jest
+        .spyOn(prisma.product, 'delete')
+        .mockResolvedValue(mockDeletedProduct as any);
+
+      const response = await request(app.getHttpServer())
+        .delete('/products/100')
+        .expect(200);
+
+      expect(response.body).toEqual({
+        ...mockDeletedProduct,
+        createdAt: mockDeletedProduct.createdAt.toISOString(),
+        updatedAt: mockDeletedProduct.updatedAt.toISOString(),
+      });
+    });
+  });
 });
