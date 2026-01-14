@@ -114,13 +114,20 @@
 **Mocking:**
 
 - Mock do PrismaService em testes unitários
-- Banco de dados real (ou in-memory) em E2E
+- **E2E Fase 1 (atual):** Mock do PrismaService para focar em HTTP/API
+- **E2E Fase 2 (futuro):** Banco PostgreSQL separado para realismo 100%
 - Usar `jest.fn()` para espionar chamadas
 
 **Cobertura esperada:**
 
 - Mínimo: 80% dos Services
 - E2E: Fluxos principais (CRUD completo de cada recurso)
+
+**Evolução dos Testes E2E:**
+
+1. ✅ **Fase Atual:** E2E com mocks (aprendizado de Supertest, foco em API)
+2. ⏭️ **Próxima Fase:** Migrar para banco PostgreSQL separado (realismo total)
+3. 🎯 **Objetivo:** Testes que garantem comportamento real em ambiente similar a produção
 
 ## 🔄 Processo de Evolução
 
