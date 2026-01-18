@@ -44,6 +44,10 @@ describe('ProductsController (e2e)', () => {
     prisma = moduleFixture.get<PrismaService>(PrismaService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   afterAll(async () => {
     await app.close();
   });
@@ -112,6 +116,11 @@ describe('ProductsController (e2e)', () => {
         createdAt: mockProduct.createdAt.toISOString(),
         updatedAt: mockProduct.updatedAt.toISOString(),
       });
+      expect(prisma.product.findUnique).toHaveBeenCalledTimes(1);
+      expect(prisma.product.findUnique).toHaveBeenCalledWith({
+        where: { id: 100 },
+        include: { ingredients: true, type: true },
+      });
     });
 
     it('should return null when product not found', async () => {
@@ -123,6 +132,11 @@ describe('ProductsController (e2e)', () => {
 
       // NestJS retorna {} quando não encontra
       expect(response.body).toEqual({});
+      expect(prisma.product.findUnique).toHaveBeenCalledTimes(1);
+      expect(prisma.product.findUnique).toHaveBeenCalledWith({
+        where: { id: 999 },
+        include: { ingredients: true, type: true },
+      });
     });
   });
 
@@ -159,6 +173,20 @@ describe('ProductsController (e2e)', () => {
         ...mockCreatedProduct,
         createdAt: mockCreatedProduct.createdAt.toISOString(),
         updatedAt: mockCreatedProduct.updatedAt.toISOString(),
+      });
+      expect(prisma.product.create).toHaveBeenCalledTimes(1);
+      expect(prisma.product.create).toHaveBeenCalledWith({
+        data: {
+          title: createDto.title,
+          image: createDto.image,
+          price: createDto.price,
+          order: createDto.order,
+          productTypeId: createDto.productTypeId,
+          ingredients: {
+            create: createDto.ingredients,
+          },
+        },
+        include: { ingredients: true, type: true },
       });
     });
 
@@ -209,6 +237,12 @@ describe('ProductsController (e2e)', () => {
         createdAt: mockUpdatedProduct.createdAt.toISOString(),
         updatedAt: mockUpdatedProduct.updatedAt.toISOString(),
       });
+      expect(prisma.product.update).toHaveBeenCalledTimes(1);
+      expect(prisma.product.update).toHaveBeenCalledWith({
+        where: { id: 100 },
+        data: updateDto,
+        include: { ingredients: true, type: true },
+      });
     });
 
     it('should return 400 for invalid data', async () => {
@@ -248,6 +282,10 @@ describe('ProductsController (e2e)', () => {
         ...mockDeletedProduct,
         createdAt: mockDeletedProduct.createdAt.toISOString(),
         updatedAt: mockDeletedProduct.updatedAt.toISOString(),
+      });
+      expect(prisma.product.delete).toHaveBeenCalledTimes(1);
+      expect(prisma.product.delete).toHaveBeenCalledWith({
+        where: { id: 100 },
       });
     });
   });

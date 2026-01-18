@@ -1,0 +1,88 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+input CreateIngredientInput {
+  name: String!
+  quantity: Int!
+}
+
+input CreateProductInput {
+  image: String!
+  ingredients: [CreateIngredientInput!]!
+  order: Int!
+  price: Float!
+  productTypeId: Int!
+  title: String!
+}
+
+input CreateProductTypeInput {
+  inUse: Boolean
+  name: String!
+  order: Int!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Ingredient {
+  id: Int!
+  name: String!
+  productId: Int!
+  quantity: Int!
+}
+
+type Mutation {
+  createProduct(createProductInput: CreateProductInput!): Product!
+  createProductType(createProductTypeInput: CreateProductTypeInput!): ProductType!
+  removeProduct(id: Int!): Product!
+  removeProductType(id: Int!): ProductType!
+  updateProduct(updateProductInput: UpdateProductInput!): Product!
+  updateProductType(updateProductTypeInput: UpdateProductTypeInput!): ProductType!
+}
+
+type Product {
+  createdAt: DateTime!
+  id: Int!
+  image: String!
+  ingredients: [Ingredient!]!
+  order: Int!
+  price: Float!
+  productTypeId: Int!
+  title: String!
+  type: ProductType!
+  updatedAt: DateTime!
+}
+
+type ProductType {
+  id: Int!
+  inUse: Boolean!
+  name: String!
+  order: Int!
+}
+
+type Query {
+  product(id: Int!): Product
+  productType(id: Int!): ProductType
+  productTypes: [ProductType!]!
+  products: [Product!]!
+}
+
+input UpdateProductInput {
+  id: Int!
+  image: String
+  ingredients: [CreateIngredientInput!]
+  order: Int
+  price: Float
+  productTypeId: Int
+  title: String
+}
+
+input UpdateProductTypeInput {
+  id: Int!
+  inUse: Boolean
+  name: String
+  order: Int
+}

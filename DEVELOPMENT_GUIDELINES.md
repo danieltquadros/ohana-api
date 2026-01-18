@@ -30,6 +30,7 @@
 - [ ] Marquei código temporário explicitamente como temporário?
 - [ ] Dei contexto suficiente para o aprendizado?
 - [ ] Avisei sobre riscos e quando/como reverter?
+- [ ] **Dei oportunidade para o usuário DIGITAR ao invés de apenas implementar?**
 
 ## 🎯 Princípios Fundamentais
 
@@ -39,6 +40,11 @@
 - Contextualizar decisões arquiteturais
 - Mostrar alternativas e seus trade-offs
 - Incentivar perguntas e pensamento crítico
+- **SEMPRE dar oportunidade para o usuário digitar o código**
+  - Para aprendizado efetivo: usuário deve escrever, não apenas ler
+  - Fornecer explicações detalhadas e deixar o usuário implementar
+  - Se implementar algo, SEMPRE explicar depois linha por linha
+  - Lembrar: o objetivo é aprendizado genuíno, não apenas código pronto
 
 ### 2. Segurança em primeiro lugar
 
@@ -142,5 +148,6 @@ Este documento é **vivo** e deve ser atualizado conforme:
 
 ---
 
-**Última atualização:** 11/01/2026
-**Versão:** 1.0.0
+7/01/2026
+**Versão:** 1.1.0 - Adicionado princípio explícito sobre deixar usuário digitar códigoção:** 11/01/2026
+**Versão:\*\* 1.0.0

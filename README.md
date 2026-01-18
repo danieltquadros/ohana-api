@@ -87,9 +87,17 @@ Ohana Sushi API is a modern, scalable REST API designed to manage a sushi restau
 ### In Progress 🚧
 
 - E2E tests for API endpoints
-- GraphQL layer (alongside REST)
 - Authentication & authorization
 - Order management system
+
+### Recently Added ✨
+
+- **GraphQL API**
+  - Full GraphQL layer alongside REST
+  - Code First approach with TypeScript
+  - Interactive playground at `/graphql`
+  - Complete CRUD for Products and ProductTypes
+  - See [GraphQL Documentation](docs/GRAPHQL.md) for details
 
 ---
 
@@ -150,6 +158,16 @@ Ohana Sushi API is a modern, scalable REST API designed to manage a sushi restau
    ```
 
 The API will be available at `http://localhost:3000`
+
+### GraphQL Playground
+
+Access the interactive GraphQL playground at:
+
+```
+http://localhost:3000/graphql
+```
+
+For complete GraphQL documentation, see [docs/GRAPHQL.md](docs/GRAPHQL.md)
 
 ---
 

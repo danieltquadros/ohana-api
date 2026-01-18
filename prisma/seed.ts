@@ -13,19 +13,19 @@ const prisma = new PrismaClient({ adapter });
 
 // Dados de exemplo dos tipos de produto
 const productTypes = [
-  'ALL',
-  'COMBO',
-  'PORTION',
-  'POKES',
-  'YAKISOBA',
-  'MEGA_HOT',
-  'TEMAKI',
-  'ITEM',
-  'DRINK',
-  'OTHER',
-  'URAMAKIS',
-  'HOTS',
-  'HOSSOS',
+  { name: 'ALL', order: 1, inUse: true },
+  { name: 'COMBO', order: 2, inUse: true },
+  { name: 'PORTION', order: 3, inUse: true },
+  { name: 'POKES', order: 4, inUse: true },
+  { name: 'YAKISOBA', order: 5, inUse: true },
+  { name: 'MEGA_HOT', order: 6, inUse: true },
+  { name: 'TEMAKI', order: 7, inUse: true },
+  { name: 'ITEM', order: 8, inUse: true },
+  { name: 'DRINK', order: 9, inUse: true },
+  { name: 'OTHER', order: 10, inUse: false },
+  { name: 'URAMAKIS', order: 11, inUse: true },
+  { name: 'HOTS', order: 12, inUse: true },
+  { name: 'HOSSOS', order: 13, inUse: true },
 ];
 
 // Dados dos produtos (migrados do front-end)
@@ -397,12 +397,16 @@ async function main() {
   console.log('📦 Criando tipos de produto...');
   const typeMap: Record<string, number> = {};
 
-  for (const typeName of productTypes) {
+  for (const type of productTypes) {
     const createdType = await prisma.productType.create({
-      data: { name: typeName },
+      data: {
+        name: type.name,
+        order: type.order,
+        inUse: type.inUse,
+      },
     });
-    typeMap[typeName] = createdType.id;
-    console.log(`   ✓ Tipo criado: ${typeName}`);
+    typeMap[type.name] = createdType.id;
+    console.log(`   ✓ Tipo criado: ${type.name} (ordem: ${type.order})`);
   }
 
   // Criar produtos com ingredientes
