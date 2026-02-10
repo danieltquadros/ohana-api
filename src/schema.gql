@@ -2,14 +2,74 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-input CreateIngredientInput {
+type Category {
+  createdAt: DateTime!
+  createdBy: Int
+  description: String
+  id: Int!
+  isActive: Boolean!
   name: String!
-  quantity: Int!
+  order: Int!
+  type: CategoryType!
+  updatedAt: DateTime!
+  updatedBy: Int
+}
+
+"""Type of category: PRODUCT or COMBO"""
+enum CategoryType {
+  COMBO
+  PRODUCT
+}
+
+type Combo {
+  categoryId: Int
+  createdAt: DateTime!
+  createdBy: Int
+  description: String
+  discount: Float
+  id: Int!
+  image: String!
+  isActive: Boolean!
+  name: String!
+  order: Int!
+  price: Float!
+  updatedAt: DateTime!
+  updatedBy: Int
+  validFrom: DateTime
+  validUntil: DateTime
+}
+
+input CreateCategoryInput {
+  description: String
+  isActive: Boolean! = true
+  name: String!
+  order: Int!
+  type: CategoryType!
+}
+
+input CreateComboInput {
+  categoryId: Int
+  description: String
+  discount: Float
+  image: String!
+  isActive: Boolean! = true
+  name: String!
+  order: Int!
+  price: Float!
+  validFrom: DateTime
+  validUntil: DateTime
+}
+
+input CreateIngredientInput {
+  description: String
+  isAllergenic: Boolean = false
+  name: String!
 }
 
 input CreateProductInput {
+  categoryId: Int
   image: String!
-  ingredients: [CreateIngredientInput!]!
+  isActive: Boolean! = true
   order: Int!
   price: Float!
   productTypeId: Int!
@@ -28,31 +88,60 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 scalar DateTime
 
 type Ingredient {
+  createdAt: DateTime!
+  createdBy: Int
+  description: String
   id: Int!
+  isAllergenic: Boolean
   name: String!
-  productId: Int!
-  quantity: Int!
+  updatedAt: DateTime!
+  updatedBy: Int
 }
 
 type Mutation {
+  createCategory(createCategoryInput: CreateCategoryInput!): Category!
+  createCombo(createComboInput: CreateComboInput!): Combo!
+  createIngredient(createIngredientInput: CreateIngredientInput!): Ingredient!
   createProduct(createProductInput: CreateProductInput!): Product!
   createProductType(createProductTypeInput: CreateProductTypeInput!): ProductType!
+  removeCategory(id: Int!): Category!
+  removeCombo(id: Int!): Combo!
+  removeIngredient(id: Int!): Ingredient!
   removeProduct(id: Int!): Product!
   removeProductType(id: Int!): ProductType!
+  updateCategory(updateCategoryInput: UpdateCategoryInput!): Category!
+  updateCombo(updateComboInput: UpdateComboInput!): Combo!
+  updateIngredient(updateIngredientInput: UpdateIngredientInput!): Ingredient!
   updateProduct(updateProductInput: UpdateProductInput!): Product!
   updateProductType(updateProductTypeInput: UpdateProductTypeInput!): ProductType!
 }
 
 type Product {
+  category: Category
+  categoryId: Int
   createdAt: DateTime!
+  createdBy: Int
   id: Int!
   image: String!
-  ingredients: [Ingredient!]!
+  ingredients: [ProductIngredient!]!
+  isActive: Boolean!
   order: Int!
   price: Float!
   productTypeId: Int!
   title: String!
   type: ProductType!
+  updatedAt: DateTime!
+  updatedBy: Int
+}
+
+type ProductIngredient {
+  createdAt: DateTime!
+  id: Int!
+  ingredient: Ingredient!
+  ingredientId: Int!
+  order: Int!
+  productId: Int!
+  quantity: Int!
   updatedAt: DateTime!
 }
 
@@ -64,16 +153,56 @@ type ProductType {
 }
 
 type Query {
+  activeCombos: [Combo!]!
+  categories: [Category!]!
+  category(id: Int!): Category!
+  combo(id: Int!): Combo!
+  combos: [Combo!]!
+  ingredient(id: Int!): Ingredient!
+  ingredients: [Ingredient!]!
   product(id: Int!): Product
   productType(id: Int!): ProductType
   productTypes: [ProductType!]!
   products: [Product!]!
+  productsByCategory(categoryId: Int!): [Product!]!
+  productsByType(typeId: Int!): [Product!]!
+}
+
+input UpdateCategoryInput {
+  description: String
+  id: Int!
+  isActive: Boolean = true
+  name: String
+  order: Int
+  type: CategoryType
+}
+
+input UpdateComboInput {
+  categoryId: Int
+  description: String
+  discount: Float
+  id: Int!
+  image: String
+  isActive: Boolean = true
+  name: String
+  order: Int
+  price: Float
+  validFrom: DateTime
+  validUntil: DateTime
+}
+
+input UpdateIngredientInput {
+  description: String
+  id: Int!
+  isAllergenic: Boolean = false
+  name: String
 }
 
 input UpdateProductInput {
+  categoryId: Int
   id: Int!
   image: String
-  ingredients: [CreateIngredientInput!]
+  isActive: Boolean = true
   order: Int
   price: Float
   productTypeId: Int

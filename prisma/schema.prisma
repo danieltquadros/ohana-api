@@ -6,17 +6,95 @@ datasource db {
   provider = "postgresql"
 }
 
+enum CategoryType {
+  PRODUCT
+  COMBO
+}
+
+model Category {
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  description String?
+  type        CategoryType
+  order       Int
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  createdBy   Int?
+  updatedBy   Int?
+  combos      Combo[]
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Combo {
+  id          Int            @id @default(autoincrement())
+  name        String         @unique
+  description String?
+  image       String
+  price       Decimal        @db.Decimal(10, 2)
+  order       Int
+  isActive    Boolean        @default(true)
+  validFrom   DateTime?
+  validUntil  DateTime?
+  discount    Decimal?       @db.Decimal(10, 2)
+  categoryId  Int?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  createdBy   Int?
+  updatedBy   Int?
+  category    Category?      @relation(fields: [categoryId], references: [id])
+  products    ComboProduct[]
+
+  @@map("combos")
+}
+
+model ComboProduct {
+  id             Int                        @id @default(autoincrement())
+  comboId        Int
+  productId      Int
+  quantity       Int
+  order          Int
+  isCustomizable Boolean                    @default(false)
+  combo          Combo                      @relation(fields: [comboId], references: [id], onDelete: Cascade)
+  product        Product                    @relation(fields: [productId], references: [id], onDelete: Restrict)
+  substitutions  ComboProductSubstitution[]
+
+  @@unique([comboId, productId])
+  @@map("combo_products")
+}
+
+model ComboProductSubstitution {
+  id                  Int          @id @default(autoincrement())
+  comboProductId      Int
+  substituteProductId Int
+  extraCost           Decimal      @db.Decimal(10, 2)
+  comboProduct        ComboProduct @relation(fields: [comboProductId], references: [id], onDelete: Cascade)
+  substituteProduct   Product      @relation("ProductSubstitutions", fields: [substituteProductId], references: [id], onDelete: Cascade)
+
+  @@unique([comboProductId, substituteProductId])
+  @@map("combo_product_substitutions")
+}
+
 model Product {
-  id            Int          @id @default(autoincrement())
+  id            Int                        @id @default(autoincrement())
   title         String
   image         String
-  price         Float
+  price         Decimal                    @db.Decimal(10, 2)
   order         Int
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  isActive      Boolean                    @default(true)
   productTypeId Int
-  ingredients   Ingredient[]
-  type          ProductType  @relation(fields: [productTypeId], references: [id])
+  categoryId    Int?
+  createdAt     DateTime                   @default(now())
+  updatedAt     DateTime                   @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  type          ProductType                @relation(fields: [productTypeId], references: [id])
+  category      Category?                  @relation(fields: [categoryId], references: [id])
+  ingredients   ProductIngredient[]
+  combos        ComboProduct[]
+  substitutions ComboProductSubstitution[] @relation("ProductSubstitutions")
 
   @@map("products")
 }
@@ -32,11 +110,28 @@ model ProductType {
 }
 
 model Ingredient {
-  id        Int     @id @default(autoincrement())
-  name      String
-  quantity  Int
-  productId Int
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  id           Int                 @id @default(autoincrement())
+  name         String              @unique
+  description  String?
+  isAllergenic Boolean?            @default(false)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  createdBy    Int?
+  updatedBy    Int?
+  products     ProductIngredient[]
 
   @@map("ingredients")
+}
+
+model ProductIngredient {
+  id           Int        @id @default(autoincrement())
+  productId    Int
+  ingredientId Int
+  quantity     Int
+  order        Int
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@unique([productId, ingredientId])
+  @@map("product_ingredients")
 }

@@ -23,6 +23,14 @@
 - [ ] Se esta solução falhar, o que precisa ser revertido?
 - [ ] Existe uma solução mais robusta e definitiva?
 - [ ] Estou tratando só o sintoma ou a causa raiz?
+- [ ] **Estou propondo a solução IDEAL ou apenas a mais simples?**
+
+### Excelência Profissional (Projeto de Portfólio)
+
+- [ ] Esta implementação impressionaria recrutadores e empresas?
+- [ ] Escolhi a abordagem mais profissional, mesmo que mais demorada?
+- [ ] Se houver uma solução técnica superior, avisei proativamente?
+- [ ] O código demonstra conhecimento avançado e boas práticas?
 
 ### Comunicação
 
@@ -73,6 +81,25 @@
 - Não acumular tentativas falhas no código
 - Limpar código experimental antes de tentar nova abordagem
 - Manter o repositório sempre em estado funcional
+
+### 6. Excelência técnica em primeiro lugar (Portfólio Profissional)
+
+- **SEMPRE escolher a solução mais profissional**, não a mais rápida
+- Se existe uma abordagem tecnicamente superior, **propô-la proativamente**
+- Este é um projeto de portfólio: código deve impressionar recrutadores
+- Preferir complexidade bem implementada a simplicidade medíocre
+- Quando houver trade-off simplicidade vs. robustez: **escolher robustez**
+- **Consultoria ativa**: Sugerir melhorias arquiteturais mesmo não solicitadas
+- Explicar por que a solução proposta é considerada "best practice" na indústria
+
+### 7. Priorizar dinamicidade e inteligência do sistema
+
+- **Dados dinâmicos > Hardcoded**: Sempre preferir configuração em banco
+- **Sistema inteligente**: Minimizar lógica manual, maximizar automação
+- **Flexibilidade**: Estruturas devem suportar mudanças sem código
+- **Normalização**: Evitar duplicação de dados (3ª forma normal)
+- **Escalabilidade**: Pensar em crescimento desde o início
+- Exemplo: Ingredientes não devem duplicar por produto - usar tabela de junção
 
 ## 📝 Convenções do Projeto
 
@@ -135,6 +162,179 @@
 2. ⏭️ **Próxima Fase:** Migrar para banco PostgreSQL separado (realismo total)
 3. 🎯 **Objetivo:** Testes que garantem comportamento real em ambiente similar a produção
 
+## 🌍 Estratégia de Ambientes e Deploy
+
+### Visão Geral do Projeto
+
+O **Ohana Sushi** está em fase de modernização da arquitetura:
+
+**Situação Atual:**
+
+- ✅ **Frontend (Next.js)** → Ambiente de **PRODUÇÃO** ativo
+  - Banco de dados Firebase (a ser substituído)
+  - Servindo clientes reais
+- 🆕 **Backend (NestJS) + PostgreSQL** → Criado para substituir Firebase
+  - Ainda não está em produção
+  - Precisa de ambientes dev e prod
+
+**Objetivo:** Migração progressiva do Firebase para PostgreSQL sem downtime
+
+### Ambientes Planejados
+
+#### 1. 🔧 Desenvolvimento (DEV) - Prioritário
+
+**Propósito:** Criar nova infraestrutura e testar migrações do Firebase
+
+**Setup:**
+
+- Backend NestJS rodando localmente ou em servidor dev
+- PostgreSQL separado (dev database)
+- Frontend conectando ao backend dev (via feature flag ou branch)
+- Seed com dados de teste
+
+**Fluxo:**
+
+1. Desenvolver novas features no backend
+2. Testar integração frontend ↔ backend dev
+3. Validar migração de dados Firebase → PostgreSQL
+4. Rodar testes E2E com banco real
+
+**Status:** ⚠️ **PRÓXIMO PASSO - PRECISA SER CRIADO**
+
+#### 2. 🚀 Produção (PRD) - Futuro
+
+**Quando criar:** Após backend dev estável e testado
+
+**Setup:**
+
+- Backend NestJS em servidor de produção
+- PostgreSQL em servidor robusto (backup, replicação)
+- Frontend apontando para backend prod
+- Migração completa dos dados Firebase
+
+**Estratégia de migração:**
+
+- Dual-write: Gravar em Firebase E PostgreSQL temporariamente
+- Validação de consistência
+- Switch gradual de leitura: Firebase → PostgreSQL
+- Desativar Firebase após validação completa
+
+### Estratégia de Branches
+
+#### Branch Principal: `main`
+
+- Código **production-ready**
+- Sempre deve buildar sem erros
+- Merges somente após code review e testes passando
+- Protegida: não fazer commits diretos
+
+#### Branches de Feature
+
+- Padrão: `feature/nome-da-feature`
+- Exemplos:
+  - `feature/categories-crud`
+  - `feature/migration-firebase-to-postgres`
+  - `feature/user-authentication`
+
+#### Branches de Hotfix
+
+- Padrão: `hotfix/descrição-do-problema`
+- Para correções urgentes em produção
+- Merge direto para `main` após validação
+
+#### Workflow Sugerido
+
+```bash
+# Criar nova feature
+git checkout main
+git pull origin main
+git checkout -b feature/minha-feature
+
+# Desenvolver e commitar
+git add .
+git commit -m "feat: descrição da feature"
+
+# Atualizar com main antes de PR
+git checkout main
+git pull origin main
+git checkout feature/minha-feature
+git rebase main  # ou merge main
+
+# Push e criar Pull Request
+git push origin feature/minha-feature
+```
+
+### Configuração por Ambiente
+
+#### Variáveis de Ambiente (.env)
+
+**DEV (.env.development):**
+
+```env
+NODE_ENV=development
+DATABASE_URL=postgresql://user:pass@localhost:5432/ohana_dev
+PORT=3000
+CORS_ORIGIN=http://localhost:3001
+```
+
+**PRD (.env.production):**
+
+```env
+NODE_ENV=production
+DATABASE_URL=postgresql://user:pass@servidor-prod:5432/ohana_prod
+PORT=3000
+CORS_ORIGIN=https://ohanasushi.com.br
+```
+
+### Checklist de Deploy
+
+#### Antes de ir para DEV
+
+- [ ] Testes unitários passando (62/62)
+- [ ] Testes E2E principais passando
+- [ ] Build sem erros
+- [ ] Migrations do Prisma documentadas
+- [ ] README atualizado com setup do ambiente
+
+#### Antes de ir para PRD
+
+- [ ] Todos os testes E2E passando com banco real
+- [ ] Performance testada (carga, latência)
+- [ ] Backup do banco configurado
+- [ ] Monitoramento configurado (logs, métricas)
+- [ ] Estratégia de rollback definida
+- [ ] Migração de dados Firebase validada
+- [ ] Frontend testado com backend prod em staging
+
+### Roadmap de Infraestrutura
+
+**Fase 1 - Setup DEV** ⚠️ **← ESTAMOS AQUI**
+
+- [ ] Criar servidor/container para backend dev
+- [ ] Setup PostgreSQL dev
+- [ ] Configurar CI/CD para branch main → deploy dev
+- [ ] Frontend dev apontando para backend dev
+
+**Fase 2 - Migração de Dados**
+
+- [ ] Script de migração Firebase → PostgreSQL
+- [ ] Validação de integridade dos dados
+- [ ] Testes de carga no backend
+
+**Fase 3 - Setup PRD**
+
+- [ ] Provisionar infraestrutura prod
+- [ ] Configurar backup e monitoramento
+- [ ] Deploy backend prod
+- [ ] Dual-write Firebase + PostgreSQL
+
+**Fase 4 - Switch Final**
+
+- [ ] Validar consistência dos dados
+- [ ] Apontar frontend para backend prod
+- [ ] Desativar Firebase
+- [ ] Comemorar! 🎉
+
 ## 🔄 Processo de Evolução
 
 Este documento é **vivo** e deve ser atualizado conforme:
@@ -148,6 +348,5 @@ Este documento é **vivo** e deve ser atualizado conforme:
 
 ---
 
-7/01/2026
-**Versão:** 1.1.0 - Adicionado princípio explícito sobre deixar usuário digitar códigoção:** 11/01/2026
-**Versão:\*\* 1.0.0
+**Última atualização:** 10/02/2026  
+**Versão:** 1.3.0 - Adicionado estratégia de ambientes, deploy e workflow de branches

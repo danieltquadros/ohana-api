@@ -20,6 +20,16 @@ export class ProductsResolver {
     return this.productsService.findAll();
   }
 
+  @Query(() => [Product], { name: 'productsByType' })
+  findByType(@Args('typeId', { type: () => Int }) typeId: number) {
+    return this.productsService.findByType(typeId);
+  }
+
+  @Query(() => [Product], { name: 'productsByCategory' })
+  findByCategory(@Args('categoryId', { type: () => Int }) categoryId: number) {
+    return this.productsService.findByCategory(categoryId);
+  }
+
   @Query(() => Product, { name: 'product', nullable: true })
   findOne(@Args('id', { type: () => Int }) id: number) {
     return this.productsService.findOne(id);

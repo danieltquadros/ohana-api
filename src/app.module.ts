@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { ProductsModule } from './products/products.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductTypesModule } from './product-types/product-types.module';
+import { CategoriesModule } from './categories/categories.module';
+import { IngredientsModule } from './ingredients/ingredients.module';
+import { CombosModule } from './combos/combos.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
@@ -20,6 +23,9 @@ import { join } from 'path';
     PrismaModule, // Registra o Prisma primeiro
     ProductsModule,
     ProductTypesModule,
+    CategoriesModule,
+    IngredientsModule,
+    CombosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

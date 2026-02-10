@@ -1,36 +1,52 @@
 import { ObjectType, Field, Int, Float } from '@nestjs/graphql';
-import { Ingredient } from './ingredient.entity';
 import { ProductType } from '../../product-types/entities/product-type.entity';
+import { Category } from '../../categories/entities/category.entity';
+import { ProductIngredient } from './product-ingredient.entity';
 
 @ObjectType()
 export class Product {
   @Field(() => Int)
-  id: number;
+  id!: number;
 
   @Field()
-  title: string;
+  title!: string;
 
   @Field()
-  image: string;
+  image!: string;
 
   @Field(() => Float)
-  price: number;
+  price!: number;
 
   @Field(() => Int)
-  order: number;
+  order!: number;
 
-  @Field(() => Date)
-  createdAt: Date;
-
-  @Field(() => Date)
-  updatedAt: Date;
+  @Field()
+  isActive!: boolean;
 
   @Field(() => Int)
-  productTypeId: number;
+  productTypeId!: number;
+
+  @Field(() => Int, { nullable: true })
+  categoryId?: number;
+
+  @Field(() => Date)
+  createdAt!: Date;
+
+  @Field(() => Date)
+  updatedAt!: Date;
+
+  @Field(() => Int, { nullable: true })
+  createdBy?: number;
+
+  @Field(() => Int, { nullable: true })
+  updatedBy?: number;
 
   @Field(() => ProductType)
-  type: ProductType;
+  type!: ProductType;
 
-  @Field(() => [Ingredient])
-  ingredients: Ingredient[];
+  @Field(() => Category, { nullable: true })
+  category?: Category;
+
+  @Field(() => [ProductIngredient])
+  ingredients!: ProductIngredient[];
 }
