@@ -3,19 +3,8 @@ import {
   IsNumber,
   IsInt,
   IsOptional,
-  IsArray,
-  ValidateNested,
+  IsBoolean,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-
-// DTO para ingredientes (aninhado)
-export class CreateIngredientDto {
-  @IsString()
-  name: string;
-
-  @IsInt()
-  quantity: number;
-}
 
 export class CreateProductDto {
   @IsString()
@@ -30,13 +19,14 @@ export class CreateProductDto {
   @IsInt()
   order: number;
 
-  @IsInt()
-  productTypeId: number; // ID do tipo de produto
-
-  // Lista de ingredientes (opcioanl)
+  @IsBoolean()
   @IsOptional()
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateIngredientDto)
-  ingredients?: CreateIngredientDto[];
+  isActive?: boolean;
+
+  @IsInt()
+  productTypeId: number;
+
+  @IsInt()
+  @IsOptional()
+  categoryId?: number;
 }

@@ -3,11 +3,9 @@ import {
   IsString,
   IsNumber,
   IsInt,
-  IsArray,
-  ValidateNested,
+  IsOptional,
+  IsBoolean,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { CreateIngredientInput } from './create-ingredient.input';
 
 @InputType()
 export class CreateProductInput {
@@ -27,13 +25,17 @@ export class CreateProductInput {
   @IsInt()
   order: number;
 
+  @Field({ defaultValue: true })
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
+
   @Field(() => Int)
   @IsInt()
   productTypeId: number;
 
-  @Field(() => [CreateIngredientInput])
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateIngredientInput)
-  ingredients: CreateIngredientInput[];
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  @IsOptional()
+  categoryId?: number;
 }

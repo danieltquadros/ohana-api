@@ -1,78 +1,110 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductInput } from './dto/create-product.input';
+import { UpdateProductInput } from './dto/update-product.input';
+import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
 
 @Injectable()
 export class ProductsService {
-  // Injeção de Dependências (DI)
-  constructor(private prisma: PrismaService) {}
-  // O NestJS injeta automaticamente o PrismaService aqui!
+  constructor(private readonly prisma: PrismaService) {}
 
-  // Buscar todos os produtos
-  async findAll() {
-    return this.prisma.product.findMany({
-      include: {
-        type: true,
-        ingredients: true,
-      },
-      orderBy: {
-        order: 'asc',
-      },
+  async create(createProductInput: CreateProductInput): Promise<Product> {
+    return this.prisma.product.create({
+      data: createProductInput,
     });
   }
 
-  // Buscar um produto por ID
-  async findOne(id: number) {
-    return this.prisma.product.findUnique({
+  async findAll(): Promise<Product[]> {
+    return this.prisma.product.findMany({
+      where: { isActive: true },
+      include: {
+        type: true,
+        category: true,
+        ingredients: {
+          include: {
+            ingredient: true,
+          },
+          orderBy: { order: 'asc' },
+        },
+      },
+      orderBy: { order: 'asc' },
+    });
+  }
+
+  async findOne(id: number): Promise<Product> {
+    const product = await this.prisma.product.findUnique({
       where: { id },
       include: {
         type: true,
-        ingredients: true,
+        category: true,
+        ingredients: {
+          include: {
+            ingredient: true,
+          },
+          orderBy: { order: 'asc' },
+        },
+        combos: {
+          include: {
+            combo: true,
+          },
+        },
       },
     });
+
+    if (!product) {
+      throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+
+    return product;
   }
 
-  // Criar um novo produto
-  async create(createProductDto: CreateProductDto) {
-    const { ingredients, ...productData } = createProductDto;
-
-    return this.prisma.product.create({
-      data: {
-        ...productData,
-        ingredients: ingredients
-          ? {
-              create: ingredients,
-            }
-          : undefined,
-      },
-      include: {
-        type: true,
-        ingredients: true,
-      },
-    });
-  }
-
-  // Atualizar um produto
-  async update(id: number, updateProductDto: UpdateProductDto) {
-    // Separar ingredients do resto dos dados
-    // Update de ingredients é complexo (precisa delete + create), deixamos para depois
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { ingredients, ...productData } = updateProductDto;
+  async update(
+    id: number,
+    updateProductInput: UpdateProductInput | UpdateProductDto,
+  ): Promise<Product> {
+    await this.findOne(id);
 
     return this.prisma.product.update({
       where: { id },
-      data: productData,
-      include: {
-        type: true,
-        ingredients: true,
-      },
+      data: updateProductInput,
     });
   }
 
-  async remove(id: number) {
-    return this.prisma.product.delete({
+  async remove(id: number): Promise<Product> {
+    await this.findOne(id);
+
+    return this.prisma.product.update({
       where: { id },
+      data: { isActive: false },
+    });
+  }
+
+  async findByType(productTypeId: number): Promise<Product[]> {
+    return this.prisma.product.findMany({
+      where: {
+        productTypeId,
+        isActive: true,
+      },
+      include: {
+        type: true,
+        category: true,
+      },
+      orderBy: { order: 'asc' },
+    });
+  }
+
+  async findByCategory(categoryId: number): Promise<Product[]> {
+    return this.prisma.product.findMany({
+      where: {
+        categoryId,
+        isActive: true,
+      },
+      include: {
+        type: true,
+        category: true,
+      },
+      orderBy: { order: 'asc' },
     });
   }
 }

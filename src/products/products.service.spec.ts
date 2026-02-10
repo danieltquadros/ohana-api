@@ -1,10 +1,34 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsService } from './products.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { NotFoundException } from '@nestjs/common';
 
 describe('ProductsService', () => {
   let service: ProductsService;
-  let prisma: PrismaService;
+
+  const mockPrismaService = {
+    product: {
+      create: jest.fn(),
+      findMany: jest.fn(),
+      findUnique: jest.fn(),
+      update: jest.fn(),
+    },
+  };
+
+  const mockProduct = {
+    id: 1,
+    title: 'Hot Filadélfia',
+    image: 'hot-filadelfia.jpg',
+    price: 45.9,
+    order: 1,
+    isActive: true,
+    productTypeId: 1,
+    categoryId: 1,
+    createdAt: new Date('2024-01-01'),
+    updatedAt: new Date('2024-01-01'),
+    createdBy: null,
+    updatedBy: null,
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -12,240 +36,296 @@ describe('ProductsService', () => {
         ProductsService,
         {
           provide: PrismaService,
-          useValue: {
-            product: {
-              findMany: jest.fn(),
-              findUnique: jest.fn(),
-              create: jest.fn(),
-              update: jest.fn(),
-              delete: jest.fn(),
-            },
-          },
+          useValue: mockPrismaService,
         },
       ],
     }).compile();
 
     service = module.get<ProductsService>(ProductsService);
     prisma = module.get<PrismaService>(PrismaService);
+
+    jest.clearAllMocks();
   });
 
   it('should be defined', () => {
     expect(service).toBeDefined();
   });
 
+  describe('create', () => {
+    it('should create a new product', async () => {
+      const createDto = {
+        title: 'Hot Filadélfia',
+        image: 'hot-filadelfia.jpg',
+        price: 45.9,
+        order: 1,
+        productTypeId: 1,
+      };
+
+      mockPrismaService.product.create.mockResolvedValue(mockProduct);
+
+      const result = await service.create(createDto);
+
+      expect(result).toEqual(mockProduct);
+      expect(mockPrismaService.product.create).toHaveBeenCalledWith({
+        data: createDto,
+      });
+      expect(mockPrismaService.product.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('should create a product with categoryId', async () => {
+      const createDto = {
+        title: 'Hot Premium',
+        image: 'hot-premium.jpg',
+        price: 65.9,
+        order: 2,
+        productTypeId: 1,
+        categoryId: 1,
+        createdBy: 1,
+      };
+
+      const productWithCategory = { ...mockProduct, ...createDto };
+      mockPrismaService.product.create.mockResolvedValue(productWithCategory);
+
+      const result = await service.create(createDto);
+
+      expect(result.categoryId).toBe(1);
+      expect(result.createdBy).toBe(1);
+    });
+  });
+
   describe('findAll', () => {
-    it('should return an array of products with type and ingredients', async () => {
-      // Arrange - Preparar dados mockados
-      const mockProducts = [
-        {
-          id: 1,
-          title: 'Combo Monstro',
-          image: 'combo-monstro.jpg',
-          price: 45.0,
-          order: 1,
-          productTypeId: 1,
-          type: { id: 1, name: 'Combos', order: 1 },
-          ingredients: [{ id: 1, name: 'Salmão', quantity: 10, productId: 1 }],
-        },
+    it('should return all active products', async () => {
+      const products = [
+        mockProduct,
+        { ...mockProduct, id: 2, title: 'Hot Salmão' },
       ];
+      mockPrismaService.product.findMany.mockResolvedValue(products);
 
-      // Configurar o mock para retornar nossos dados
-      jest
-        .spyOn(prisma.product, 'findMany')
-        .mockResolvedValue(mockProducts as any);
-
-      // Act - Executar o método
       const result = await service.findAll();
 
-      // Assert - Verificar resultados
-      expect(result).toEqual(mockProducts);
-      expect(prisma.product.findMany).toHaveBeenCalledTimes(1);
-      expect(prisma.product.findMany).toHaveBeenCalledWith({
+      expect(result).toEqual(products);
+      expect(mockPrismaService.product.findMany).toHaveBeenCalledWith({
+        where: { isActive: true },
         include: {
           type: true,
-          ingredients: true,
+          category: true,
+          ingredients: {
+            include: {
+              ingredient: true,
+            },
+            orderBy: { order: 'asc' },
+          },
         },
-        orderBy: {
-          order: 'asc',
-        },
+        orderBy: { order: 'asc' },
       });
+    });
+
+    it('should return empty array when no products exist', async () => {
+      mockPrismaService.product.findMany.mockResolvedValue([]);
+
+      const result = await service.findAll();
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findByType', () => {
+    it('should return products filtered by type', async () => {
+      const products = [mockProduct];
+      mockPrismaService.product.findMany.mockResolvedValue(products);
+
+      const result = await service.findByType(1);
+
+      expect(result).toEqual(products);
+      expect(mockPrismaService.product.findMany).toHaveBeenCalledWith({
+        where: {
+          isActive: true,
+          productTypeId: 1,
+        },
+        include: {
+          type: true,
+          category: true,
+        },
+        orderBy: { order: 'asc' },
+      });
+    });
+
+    it('should return empty array when no products match type', async () => {
+      mockPrismaService.product.findMany.mockResolvedValue([]);
+
+      const result = await service.findByType(999);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('findByCategory', () => {
+    it('should return products filtered by category', async () => {
+      const products = [mockProduct];
+      mockPrismaService.product.findMany.mockResolvedValue(products);
+
+      const result = await service.findByCategory(1);
+
+      expect(result).toEqual(products);
+      expect(mockPrismaService.product.findMany).toHaveBeenCalledWith({
+        where: {
+          isActive: true,
+          categoryId: 1,
+        },
+        include: {
+          type: true,
+          category: true,
+        },
+        orderBy: { order: 'asc' },
+      });
+    });
+
+    it('should return empty array when no products match category', async () => {
+      mockPrismaService.product.findMany.mockResolvedValue([]);
+
+      const result = await service.findByCategory(999);
+
+      expect(result).toEqual([]);
     });
   });
 
   describe('findOne', () => {
-    it('should return a product by id with relations', async () => {
-      // Arrange
-      const mockProduct = {
-        id: 100,
-        title: 'Combo Monstro',
-        image: 'combo-monstro.jpg',
-        price: 45.0,
-        order: 1,
-        productTypeId: 1,
-        type: { id: 1, name: 'Combos', order: 1 },
-        ingredients: [{ id: 1, name: 'Salmão', quantity: 10, productId: 100 }],
-      };
+    it('should return a product by id', async () => {
+      mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
 
-      jest
-        .spyOn(prisma.product, 'findUnique')
-        .mockResolvedValue(mockProduct as any);
+      const result = await service.findOne(1);
 
-      // Act
-      const result = await service.findOne(100);
-
-      // Assert
       expect(result).toEqual(mockProduct);
-      expect(prisma.product.findUnique).toHaveBeenCalledWith({
-        where: { id: 100 },
-        include: { type: true, ingredients: true },
-      });
-    });
-
-    it('should return null when product not found', async () => {
-      // Arrange
-      jest.spyOn(prisma.product, 'findUnique').mockResolvedValue(null);
-
-      // Act
-      const result = await service.findOne(999);
-
-      // Assert
-      expect(result).toBeNull();
-      expect(prisma.product.findUnique).toHaveBeenCalledWith({
-        where: { id: 999 },
-        include: { type: true, ingredients: true },
-      });
-    });
-  });
-
-  describe('create', () => {
-    it('should create a product with ingredients', async () => {
-      // Arrange
-      const createProductDto = {
-        title: 'Novo Combo',
-        image: 'novo-combo.jpg',
-        price: 30.0,
-        order: 10,
-        productTypeId: 1,
-        ingredients: [
-          { name: 'Salmão', quantity: 5 },
-          { name: 'Cream Cheese', quantity: 2 },
-        ],
-      };
-
-      const mockCreatedProduct = {
-        id: 200,
-        title: 'Novo Combo',
-        image: 'novo-combo.jpg',
-        price: 30.0,
-        order: 10,
-        productTypeId: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        type: { id: 1, name: 'Combos', order: 1 },
-        ingredients: [
-          { id: 50, name: 'Salmão', quantity: 5, productId: 200 },
-          { id: 51, name: 'Cream Cheese', quantity: 2, productId: 200 },
-        ],
-      };
-
-      jest
-        .spyOn(prisma.product, 'create')
-        .mockResolvedValue(mockCreatedProduct as any);
-
-      // Act
-      const result = await service.create(createProductDto);
-
-      // Assert
-      expect(result).toEqual(mockCreatedProduct);
-      expect(prisma.product.create).toHaveBeenCalledWith({
-        data: {
-          title: 'Novo Combo',
-          image: 'novo-combo.jpg',
-          price: 30.0,
-          order: 10,
-          productTypeId: 1,
-          ingredients: {
-            create: [
-              { name: 'Salmão', quantity: 5 },
-              { name: 'Cream Cheese', quantity: 2 },
-            ],
-          },
-        },
+      expect(mockPrismaService.product.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
         include: {
           type: true,
-          ingredients: true,
+          category: true,
+          ingredients: {
+            include: {
+              ingredient: true,
+            },
+            orderBy: { order: 'asc' },
+          },
+          combos: {
+            include: {
+              combo: true,
+            },
+          },
         },
       });
+    });
+
+    it('should throw NotFoundException when product does not exist', async () => {
+      mockPrismaService.product.findUnique.mockResolvedValue(null);
+
+      await expect(service.findOne(999)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(999)).rejects.toThrow(
+        'Product with ID 999 not found',
+      );
     });
   });
 
   describe('update', () => {
     it('should update a product', async () => {
-      // Arrange
-      const updateProductDto = {
-        title: 'Combo Atualizado',
-        price: 50.0,
+      const updateDto = {
+        title: 'Hot Filadélfia Atualizado',
+        price: 49.9,
+        updatedBy: 1,
       };
 
-      const mockUpdatedProduct = {
-        id: 100,
-        title: 'Combo Atualizado',
-        image: 'combo-monstro.jpg',
-        price: 50.0,
-        order: 1,
-        productTypeId: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        type: { id: 1, name: 'Combos', order: 1 },
-        ingredients: [],
-      };
+      const updatedProduct = { ...mockProduct, ...updateDto };
+      mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+      mockPrismaService.product.update.mockResolvedValue(updatedProduct);
 
-      jest
-        .spyOn(prisma.product, 'update')
-        .mockResolvedValue(mockUpdatedProduct as any);
+      const result = await service.update(1, updateDto);
 
-      // Act
-      const result = await service.update(100, updateProductDto);
-
-      // Assert
-      expect(result).toEqual(mockUpdatedProduct);
-      expect(prisma.product.update).toHaveBeenCalledWith({
-        where: { id: 100 },
-        data: updateProductDto,
+      expect(result).toEqual(updatedProduct);
+      expect(mockPrismaService.product.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
         include: {
           type: true,
-          ingredients: true,
+          category: true,
+          ingredients: {
+            include: {
+              ingredient: true,
+            },
+            orderBy: { order: 'asc' },
+          },
+          combos: {
+            include: {
+              combo: true,
+            },
+          },
         },
       });
+      expect(mockPrismaService.product.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: updateDto,
+      });
+    });
+
+    it('should update categoryId', async () => {
+      const updateDto = { categoryId: 2 };
+      const updatedProduct = { ...mockProduct, categoryId: 2 };
+
+      mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+      mockPrismaService.product.update.mockResolvedValue(updatedProduct);
+
+      const result = await service.update(1, updateDto);
+
+      expect(result.categoryId).toBe(2);
+    });
+
+    it('should throw NotFoundException when updating non-existent product', async () => {
+      const updateDto = { title: 'Updated' };
+      mockPrismaService.product.findUnique.mockResolvedValue(null);
+
+      await expect(service.update(999, updateDto)).rejects.toThrow(
+        NotFoundException,
+      );
+      expect(mockPrismaService.product.update).not.toHaveBeenCalled();
     });
   });
 
   describe('remove', () => {
-    it('should delete a product', async () => {
-      // Arrange
-      const mockDeletedProduct = {
-        id: 100,
-        title: 'Combo Monstro',
-        image: 'combo-monstro.jpg',
-        price: 45.0,
-        order: 1,
-        productTypeId: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
+    it('should soft delete a product', async () => {
+      const softDeletedProduct = { ...mockProduct, isActive: false };
+      mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+      mockPrismaService.product.update.mockResolvedValue(softDeletedProduct);
 
-      jest
-        .spyOn(prisma.product, 'delete')
-        .mockResolvedValue(mockDeletedProduct as any);
+      const result = await service.remove(1);
 
-      // Act
-      const result = await service.remove(100);
-
-      // Assert
-      expect(result).toEqual(mockDeletedProduct);
-      expect(prisma.product.delete).toHaveBeenCalledWith({
-        where: { id: 100 },
+      expect(result).toEqual(softDeletedProduct);
+      expect(mockPrismaService.product.findUnique).toHaveBeenCalledWith({
+        where: { id: 1 },
+        include: {
+          type: true,
+          category: true,
+          ingredients: {
+            include: {
+              ingredient: true,
+            },
+            orderBy: { order: 'asc' },
+          },
+          combos: {
+            include: {
+              combo: true,
+            },
+          },
+        },
       });
+      expect(mockPrismaService.product.update).toHaveBeenCalledWith({
+        where: { id: 1 },
+        data: { isActive: false },
+      });
+    });
+
+    it('should throw NotFoundException when removing non-existent product', async () => {
+      mockPrismaService.product.findUnique.mockResolvedValue(null);
+
+      await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+      expect(mockPrismaService.product.update).not.toHaveBeenCalled();
     });
   });
 });
