@@ -162,62 +162,7 @@
 2. ⏭️ **Próxima Fase:** Migrar para banco PostgreSQL separado (realismo total)
 3. 🎯 **Objetivo:** Testes que garantem comportamento real em ambiente similar a produção
 
-## 🌍 Estratégia de Ambientes e Deploy
-
-### Visão Geral do Projeto
-
-O **Ohana Sushi** está em fase de modernização da arquitetura:
-
-**Situação Atual:**
-
-- ✅ **Frontend (Next.js)** → Ambiente de **PRODUÇÃO** ativo
-  - Banco de dados Firebase (a ser substituído)
-  - Servindo clientes reais
-- 🆕 **Backend (NestJS) + PostgreSQL** → Criado para substituir Firebase
-  - Ainda não está em produção
-  - Precisa de ambientes dev e prod
-
-**Objetivo:** Migração progressiva do Firebase para PostgreSQL sem downtime
-
-### Ambientes Planejados
-
-#### 1. 🔧 Desenvolvimento (DEV) - Prioritário
-
-**Propósito:** Criar nova infraestrutura e testar migrações do Firebase
-
-**Setup:**
-
-- Backend NestJS rodando localmente ou em servidor dev
-- PostgreSQL separado (dev database)
-- Frontend conectando ao backend dev (via feature flag ou branch)
-- Seed com dados de teste
-
-**Fluxo:**
-
-1. Desenvolver novas features no backend
-2. Testar integração frontend ↔ backend dev
-3. Validar migração de dados Firebase → PostgreSQL
-4. Rodar testes E2E com banco real
-
-**Status:** ⚠️ **PRÓXIMO PASSO - PRECISA SER CRIADO**
-
-#### 2. 🚀 Produção (PRD) - Futuro
-
-**Quando criar:** Após backend dev estável e testado
-
-**Setup:**
-
-- Backend NestJS em servidor de produção
-- PostgreSQL em servidor robusto (backup, replicação)
-- Frontend apontando para backend prod
-- Migração completa dos dados Firebase
-
-**Estratégia de migração:**
-
-- Dual-write: Gravar em Firebase E PostgreSQL temporariamente
-- Validação de consistência
-- Switch gradual de leitura: Firebase → PostgreSQL
-- Desativar Firebase após validação completa
+## 🌍 Estratégia de Ambientes
 
 ### Estratégia de Branches
 
@@ -233,8 +178,8 @@ O **Ohana Sushi** está em fase de modernização da arquitetura:
 - Padrão: `feature/nome-da-feature`
 - Exemplos:
   - `feature/categories-crud`
-  - `feature/migration-firebase-to-postgres`
   - `feature/user-authentication`
+  - `feature/image-upload`
 
 #### Branches de Hotfix
 
@@ -286,54 +231,7 @@ PORT=3000
 CORS_ORIGIN=https://ohanasushi.com.br
 ```
 
-### Checklist de Deploy
-
-#### Antes de ir para DEV
-
-- [ ] Testes unitários passando (62/62)
-- [ ] Testes E2E principais passando
-- [ ] Build sem erros
-- [ ] Migrations do Prisma documentadas
-- [ ] README atualizado com setup do ambiente
-
-#### Antes de ir para PRD
-
-- [ ] Todos os testes E2E passando com banco real
-- [ ] Performance testada (carga, latência)
-- [ ] Backup do banco configurado
-- [ ] Monitoramento configurado (logs, métricas)
-- [ ] Estratégia de rollback definida
-- [ ] Migração de dados Firebase validada
-- [ ] Frontend testado com backend prod em staging
-
-### Roadmap de Infraestrutura
-
-**Fase 1 - Setup DEV** ⚠️ **← ESTAMOS AQUI**
-
-- [ ] Criar servidor/container para backend dev
-- [ ] Setup PostgreSQL dev
-- [ ] Configurar CI/CD para branch main → deploy dev
-- [ ] Frontend dev apontando para backend dev
-
-**Fase 2 - Migração de Dados**
-
-- [ ] Script de migração Firebase → PostgreSQL
-- [ ] Validação de integridade dos dados
-- [ ] Testes de carga no backend
-
-**Fase 3 - Setup PRD**
-
-- [ ] Provisionar infraestrutura prod
-- [ ] Configurar backup e monitoramento
-- [ ] Deploy backend prod
-- [ ] Dual-write Firebase + PostgreSQL
-
-**Fase 4 - Switch Final**
-
-- [ ] Validar consistência dos dados
-- [ ] Apontar frontend para backend prod
-- [ ] Desativar Firebase
-- [ ] Comemorar! 🎉
+> **📋 Para roadmap detalhado, status de fases e plano de ação:** Ver [ACTION_PLAN.md](./ACTION_PLAN.md)
 
 ## 🔄 Processo de Evolução
 
