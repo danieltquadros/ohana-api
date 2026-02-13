@@ -5,6 +5,9 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Define prefixo global para rotas REST
+  app.setGlobalPrefix('api');
+
   // Habilita validação automática em toda a aplicação
   app.useGlobalPipes(
     new ValidationPipe({
