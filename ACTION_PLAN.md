@@ -87,14 +87,14 @@ PRODUÇÃO (www.ohanasushidelivery.com.br):
 
 ## 🎯 Roadmap de Desenvolvimento
 
-### ⚡ FASE 1: Setup Backend DEV (Em Andamento)
+### ✅ FASE 1: Setup Backend DEV (CONCLUÍDA)
 
 **Objetivo:** Backend rodando em ambiente DEV acessível via internet
 
-#### Passo 1.1: Sincronizar Dados ⬅️ **PRÓXIMO**
+#### Passo 1.1: Sincronizar Dados
 
-- [ ] Rodar seed atualizado com preços do frontend
-- [ ] Validar dados no banco local
+- [x] Rodar seed atualizado com preços do frontend
+- [x] Validar dados no banco local
 
 **Comando:**
 
@@ -107,51 +107,48 @@ npx ts-node prisma/seed.ts
 
 **1.2.1 - Criar Conta Render**
 
-- [ ] Acessar: https://render.com
-- [ ] Sign up com GitHub
-- [ ] Conectar repositório `danieltquadros/ohana-api`
+- [x] Acessar: https://render.com
+- [x] Sign up com GitHub
+- [x] Conectar repositório `danieltquadros/ohana-api`
 
 **1.2.2 - Criar PostgreSQL DEV**
 
-- [ ] Dashboard → New → PostgreSQL
-- [ ] Nome: `ohana-api-dev-db`
-- [ ] Region: Oregon (US West)
-- [ ] Plano: **Free**
-- [ ] Copiar `Internal Database URL` para usar no backend
+- [x] Dashboard → New → PostgreSQL
+- [x] Nome: `ohana-api-dev-db`
+- [x] Region: Oregon (US West)
+- [x] Plano: **Free**
+- [x] Copiar `Internal Database URL` para usar no backend
 
 **1.2.3 - Criar Web Service (Backend)**
 
-- [ ] Dashboard → New → Web Service
-- [ ] Repository: `danieltquadros/ohana-api`
-- [ ] Nome: `ohana-api-dev`
-- [ ] Branch: `main`
-- [ ] Region: Oregon (mesma do banco)
-- [ ] Build Command: `npm install && npx prisma generate && npm run build`
-- [ ] Start Command: `npm run start:prod`
-- [ ] Plano: **Free**
+- [x] Dashboard → New → Web Service
+- [x] Repository: `danieltquadros/ohana-api`
+- [x] Nome: `ohana-api-dev`
+- [x] Branch: `main`
+- [x] Region: Oregon (mesma do banco)
+- [x] Build Command: `npm install && npx prisma generate && npm run build`
+- [x] Start Command: `npm run start:prod`
+- [x] Plano: **Free**
 
 **1.2.4 - Configurar Environment Variables**
 
-No dashboard do Web Service, adicionar:
-
-```env
-DATABASE_URL=[Copiar do PostgreSQL criado - Internal Database URL]
-NODE_ENV=development
-PORT=3000
-CORS_ORIGIN=https://dev.ohanasushidelivery.com.br,http://localhost:3001
-```
+- [x] No dashboard do Web Service, adicionar:
+  - DATABASE_URL (Internal Database URL do PostgreSQL)
+  - NODE_ENV=development
+  - PORT=3000
+  - CORS_ORIGIN (URLs do frontend)
 
 **1.2.5 - Executar Migration no Render**
 
-- [ ] Abrir Shell no dashboard do Web Service
-- [ ] Executar: `npx prisma migrate deploy`
-- [ ] Executar: `npx ts-node prisma/seed.ts` (ou rodar localmente apontando pro DB remoto)
+- [x] Executar migrations (auto-deploy faz isso)
+- [x] Executar seed localmente apontando para DB remoto (External URL)
+- [x] Configurar SSL no Pool para conexões remotas
 
 **1.2.6 - Validar Backend DEV**
 
-- [ ] Acessar: `https://ohana-api-dev.onrender.com/api/products`
-- [ ] Verificar se retorna JSON com produtos
-- [ ] Testar GraphQL: `https://ohana-api-dev.onrender.com/graphql`
+- [x] Acessar: `https://ohana-api-dev-a7kk.onrender.com/api/products`
+- [x] Verificar se retorna JSON com produtos
+- [x] Testar GraphQL: `https://ohana-api-dev-a7kk.onrender.com/graphql`
 
 ---
 
@@ -201,7 +198,7 @@ DATABASE_URL=[manter o atual ou criar novo para DEV]
 
 ---
 
-### 🔐 FASE 3: Features Essenciais
+### 🔐 FASE 3: Features Essenciais ⬅️ **PRÓXIMA**
 
 **Objetivo:** Backend com funcionalidades necessárias para produção
 
