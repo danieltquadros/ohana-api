@@ -5,6 +5,18 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // Configurar CORS para permitir acesso do frontend
+  app.enableCors({
+    origin: [
+      'http://localhost:3000', // Desenvolvimento local
+      'http://localhost:3001',
+      'https://ohana-sushi-delivery-git-development-danieltquadros-projects.vercel.app', // Frontend DEV
+      'https://www.ohanasushidelivery.com.br', // Frontend PRD
+      'https://ohanasushidelivery.com.br', // Frontend PRD (sem www)
+    ],
+    credentials: true,
+  });
+
   // Define prefixo global para rotas REST
   app.setGlobalPrefix('api');
 
