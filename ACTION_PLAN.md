@@ -152,7 +152,7 @@ npx ts-node prisma/seed.ts
 
 ---
 
-### 🌐 FASE 2: Setup Frontend DEV
+### ✅ FASE 2: Setup Frontend DEV (CONCLUÍDA)
 
 **Objetivo:** Frontend de desenvolvimento consumindo Backend DEV
 
@@ -160,154 +160,238 @@ npx ts-node prisma/seed.ts
 
 **Repositório:** `danieltquadros/ohana_sushi`
 
-```bash
-cd c:\rep\dtq\ohana\ohana_sushi
-git checkout master
-git pull origin master
-git checkout -b development
-```
+- [x] Criar branch `development` a partir de `master`
+- [x] Commit: `4f975d2`
 
 #### Passo 2.2: Configurar Environment Variable
 
-Criar/atualizar `.env.development`:
-
-```env
-NEXT_PUBLIC_API_URL=https://ohana-api-dev.onrender.com
-DATABASE_URL=[manter o atual ou criar novo para DEV]
-```
+- [x] Criado `.env.development`:
+  ```env
+  NEXT_PUBLIC_API_URL=https://ohana-api-dev-a7kk.onrender.com/api
+  DATABASE_URL=[mantido temporariamente]
+  ```
+- [x] Atualizado `services/api.ts` para usar `NEXT_PUBLIC_API_URL`
 
 #### Passo 2.3: Deploy Frontend DEV
 
-**Opção A - Vercel Preview (Automático):**
+- [x] Push branch `development` para GitHub
+- [x] Vercel automaticamente criou preview
+- [x] URL DEV: https://ohana-sushi-delivery-git-development-danieltquadros-projects.vercel.app/
+- [x] URL PRD mantida: https://www.ohanasushidelivery.com.br/
 
-- [ ] Push branch `development` para GitHub
-- [ ] Vercel automaticamente cria preview: `ohana-sushi-git-development.vercel.app`
-- [ ] Acessar e testar
+#### Passo 2.4: Validar Integração Básica
 
-**Opção B - Custom Domain:**
-
-- [ ] Configurar no DNS: `dev.ohanasushidelivery.com.br` → Vercel
-- [ ] No Vercel, settings → Domains → Add `dev.ohanasushidelivery.com.br`
-- [ ] Associar à branch `development`
-
-#### Passo 2.4: Validar Integração
-
-- [ ] Frontend DEV carrega produtos do Backend DEV
-- [ ] CORS funciona corretamente
-- [ ] Todas as features principais funcionando
+- [x] Vercel detectou e deployou branch `development`
+- [x] Ambientes DEV e PRD rodando separadamente
 
 ---
 
-### 🔐 FASE 3: Features Essenciais ⬅️ **PRÓXIMA**
+### 🔄 FASE 3: Migração Database DEV ⬅️ **PRÓXIMA**
+
+**Objetivo:** Frontend DEV consumir 100% do Backend DEV, remover Prisma do frontend DEV
+
+#### 3.1 - Análise do Frontend Atual
+
+- [ ] Identificar todas as queries Prisma no frontend
+- [ ] Listar todas as operações de banco: products, categories, ingredients, combos, orders
+- [ ] Mapear quais endpoints do backend já existem
+- [ ] Identificar endpoints faltantes no backend
+
+#### 3.2 - Garantir Endpoints no Backend DEV
+
+- [ ] Validar endpoints REST:
+  - `/api/products` ✅ (já existe)
+  - `/api/categories` ✅ (já existe)
+  - `/api/ingredients` ✅ (já existe)
+  - `/api/combos` ✅ (já existe)
+  - `/api/product-types` ✅ (já existe)
+- [ ] Criar endpoints adicionais se necessário (orders, cart, etc.)
+
+#### 3.3 - Refatorar Frontend DEV
+
+**Branch:** `development`
+
+- [ ] Substituir todas as queries Prisma por chamadas à API backend
+- [ ] Atualizar `services/api.ts` com todas as funções necessárias:
+  ```typescript
+  // Exemplos:
+  export async function fetchProducts();
+  export async function fetchCategories();
+  export async function fetchIngredients();
+  export async function fetchCombos();
+  // ... outros conforme necessário
+  ```
+- [ ] Testar localmente (frontend DEV rodando em localhost, consumindo backend DEV no Render)
+
+#### 3.4 - Remover Prisma do Frontend DEV
+
+- [ ] Remover imports de `@prisma/client` dos componentes/páginas
+- [ ] Remover pasta `prisma/` do frontend
+- [ ] Remover dependências do `package.json`:
+  - `@prisma/client`
+  - `prisma`
+  - `@prisma/adapter-vercel`
+- [ ] Remover `DATABASE_URL` do `.env.development`
+- [ ] Atualizar build scripts (remover `prisma generate`)
+
+#### 3.5 - Deploy e Validação DEV
+
+- [ ] Commit e push das mudanças na branch `development`
+- [ ] Vercel redeploy automático
+- [ ] Testar **TODAS** as funcionalidades no frontend DEV:
+  - [ ] Listagem de produtos
+  - [ ] Filtros e busca
+  - [ ] Carrinho de compras
+  - [ ] Formulário de pedido
+  - [ ] Qualquer outra feature que use dados do banco
+- [ ] Validar performance (latência aceitável DEV → Render)
+- [ ] Confirmar CORS funcionando corretamente
+
+---
+
+### 🚀 FASE 4: Setup Backend PRD
+
+**Objetivo:** Criar infraestrutura de produção robusta no Render
+
+#### 4.1 - Provisionar PostgreSQL PRD
+
+- [ ] Dashboard Render → New → PostgreSQL
+- [ ] Nome: `ohana-api-prod-db`
+- [ ] Region: Oregon (US West)
+- [ ] Plano: **Starter** ($7/mês - 1GB, backups diários)
+- [ ] Copiar `Internal Database URL`
+
+#### 4.2 - Provisionar Web Service PRD
+
+- [ ] Dashboard Render → New → Web Service
+- [ ] Repository: `danieltquadros/ohana-api`
+- [ ] Nome: `ohana-api-prod`
+- [ ] Branch: `main` (mesmo branch, diferencia por env vars)
+- [ ] Region: Oregon
+- [ ] Build Command: `npm install && npx prisma generate && npm run build`
+- [ ] Start Command: `npm run start:prod`
+- [ ] Plano: **Starter** ($7/mês - 512MB RAM, sempre ativo)
+
+#### 4.3 - Configurar Environment Variables PRD
+
+```env
+DATABASE_URL=[Internal Database URL do PostgreSQL PRD]
+NODE_ENV=production
+PORT=3000
+CORS_ORIGIN=https://www.ohanasushidelivery.com.br
+```
+
+#### 4.4 - Executar Migration e Seed PRD
+
+- [ ] Localmente, apontar para banco PRD (External URL)
+- [ ] Executar: `npx prisma migrate deploy`
+- [ ] Executar: `npx ts-node prisma/seed.ts` (popula com dados de produção)
+
+#### 4.5 - Validar Backend PRD
+
+- [ ] Acessar: `https://ohana-api-prod-[hash].onrender.com/api/products`
+- [ ] Verificar retorno com produtos
+- [ ] Testar GraphQL: `https://ohana-api-prod-[hash].onrender.com/graphql`
+  - **Apollo Sandbox desabilitado** em PRD ✅ (NODE_ENV=production)
+
+#### 4.6 - Custom Domain PRD (Opcional)
+
+- [ ] Configurar DNS: `api.ohanasushidelivery.com.br` → Render
+- [ ] No Render, add custom domain
+- [ ] Certificado SSL automático
+- [ ] Atualizar CORS_ORIGIN se necessário
+
+---
+
+### 🔄 FASE 5: Migração Database PRD
+
+**Objetivo:** Frontend PRD consumir 100% do Backend PRD, remover Prisma do frontend PRD
+
+#### 5.1 - Preparação
+
+- [ ] Backend PRD rodando e validado (Fase 4 completa)
+- [ ] Todos os endpoints necessários disponíveis
+- [ ] Dados de produção populados no banco PRD
+
+#### 5.2 - Atualizar Frontend PRD
+
+**Branch:** `master`
+
+- [ ] Fazer merge de `development` → `master` (traz refatorações da Fase 3)
+- [ ] Atualizar `.env.production`:
+  ```env
+  NEXT_PUBLIC_API_URL=https://ohana-api-prod-[hash].onrender.com/api
+  # OU se configurou custom domain:
+  NEXT_PUBLIC_API_URL=https://api.ohanasushidelivery.com.br/api
+  ```
+- [ ] Remover `DATABASE_URL` completamente
+- [ ] Confirmar que não há imports de `@prisma/client`
+
+#### 5.3 - Deploy PRD
+
+- [ ] Push branch `master` para GitHub
+- [ ] Vercel deploy automático em www.ohanasushidelivery.com.br
+- [ ] Monitorar logs durante deploy
+
+#### 5.4 - Validação PRD e Go Live
+
+- [ ] Testar **TODAS** as funcionalidades em produção:
+  - [ ] Listagem de produtos
+  - [ ] Filtros e busca
+  - [ ] Carrinho de compras
+  - [ ] Formulário de pedido
+  - [ ] Integração com WhatsApp
+  - [ ] Qualquer outra feature crítica
+- [ ] Validar performance (latência aceitável)
+- [ ] Monitorar erros no console do navegador
+- [ ] Testar em diferentes dispositivos (mobile, desktop)
+
+#### 5.5 - Plano de Rollback
+
+**Se algo der errado:**
+
+- [ ] Reverter deploy no Vercel (dashboard → rollback)
+- [ ] OU atualizar `.env.production` para voltar ao banco antigo temporariamente
+- [ ] Investigar e corrigir problema
+- [ ] Tentar novamente
+
+#### 5.6 - Desativação do Banco Antigo
+
+- [ ] Aguardar 30 dias de estabilidade
+- [ ] Exportar backup final do banco Vercel Postgres
+- [ ] Desativar banco antigo do frontend
+- [ ] Documentar migração completa
+
+---
+
+### 🔐 FASE 6: Features Essenciais
 
 **Objetivo:** Backend com funcionalidades necessárias para produção
 
-#### 3.1 - Autenticação/Autorização
+#### 6.1 - Autenticação/Autorização
 
 - [ ] Implementar JWT authentication
 - [ ] Roles: Admin, User
 - [ ] Proteger endpoints administrativos
 
-#### 3.2 - Upload de Imagens
+#### 6.2 - Upload de Imagens
 
 - [ ] Integração com Cloudinary ou S3
 - [ ] Endpoint para upload de imagens de produtos
 - [ ] Validação de tipos de arquivo
 
-#### 3.3 - Painel Administrativo (Backend)
+#### 6.3 - Painel Administrativo (Backend)
 
 - [ ] CRUD de produtos via API
 - [ ] Gerenciamento de categorias
 - [ ] Gerenciamento de ingredientes
 - [ ] Dashboard de pedidos (futuro)
 
----
-
-### 🚀 FASE 4: Setup Produção
-
-**Objetivo:** Backend PRD estável e robusto
-
-#### 4.1 - Provisionar Infraestrutura PRD no Render
-
-**PostgreSQL PRD:**
-
-- [ ] Criar novo PostgreSQL (Paid Tier com backup)
-- [ ] Nome: `ohana-api-prod-db`
-- [ ] Plano: Starter ($7/mês - 1GB, backups diários)
-
-**Web Service PRD:**
-
-- [ ] Criar novo Web Service
-- [ ] Nome: `ohana-api-prod`
-- [ ] Branch: `main`
-- [ ] Plano: Starter ($7/mês - 512MB RAM, sempre ativo)
-
-**Environment Variables PRD:**
-
-```env
-DATABASE_URL=[PostgreSQL PRD URL]
-NODE_ENV=production
-PORT=3000
-CORS_ORIGIN=https://www.ohanasushidelivery.com.br
-JWT_SECRET=[gerar secret seguro]
-```
-
-#### 4.2 - Custom Domain (Opcional)
-
-- [ ] Configurar DNS: `api.ohanasushidelivery.com.br` → Render
-- [ ] Certificado SSL automático
-
-#### 4.3 - Migração de Dados
-
-**Opção A - Script de Migração:**
-
-- [ ] Criar script para copiar dados do frontend para backend
-- [ ] Validar integridade dos dados
-
-**Opção B - Dual Database Temporário:**
-
-- [ ] Frontend grava em ambos os bancos
-- [ ] Validar consistência
-- [ ] Migrar leitura gradualmente
-
-#### 4.4 - Monitoramento
+#### 6.4 - Monitoramento e Logs
 
 - [ ] Configurar logs estruturados
 - [ ] Alertas de erro (email ou Slack)
 - [ ] Monitorar performance do banco
-
----
-
-### 🔄 FASE 5: Switch Final
-
-**Objetivo:** Frontend PRD consumindo Backend PRD
-
-#### 5.1 - Atualizar Frontend PRD
-
-- [ ] Branch `master` do frontend
-- [ ] Atualizar `.env.production`:
-  ```env
-  NEXT_PUBLIC_API_URL=https://api.ohanasushidelivery.com.br
-  ```
-- [ ] Deploy na Vercel
-
-#### 5.2 - Validação e Rollback Plan
-
-- [ ] Testar todas as funcionalidades em staging
-- [ ] Plano de rollback: reverter env var do frontend
-- [ ] Manter banco antigo por 30 dias (backup)
-
-#### 5.3 - Go Live
-
-- [ ] Switch de produção em horário de baixo tráfego
-- [ ] Monitorar logs e erros
-- [ ] Validar fluxo completo de pedidos
-
-#### 5.4 - Desativação do Banco Antigo
-
-- [ ] Após 30 dias de validação
-- [ ] Exportar backup final
-- [ ] Desativar banco antigo do frontend
 
 ---
 
@@ -387,6 +471,6 @@ npx prisma studio          # UI do banco
 
 ---
 
-**Última atualização:** 12/02/2026  
-**Versão:** 1.0.0  
-**Próximo passo:** Rodar seed + Setup Render DEV
+**Última atualização:** 14/02/2026  
+**Versão:** 2.0.0  
+**Próximo passo:** Fase 3 - Migração Database DEV (remover Prisma do frontend)

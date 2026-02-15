@@ -4,9 +4,6 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // await app.listen(3000, {
-  //   playground: process.env.NODE_ENV !== 'production', // Desabilita em PRD
-  // });
 
   // Define prefixo global para rotas REST
   app.setGlobalPrefix('api');

@@ -18,7 +18,7 @@ import { join } from 'path';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
-      playground: true, // Habilitar GraphQL Playground em desenvolvimento
+      playground: process.env.NODE_ENV !== 'production', // Desabilita Apollo Sandbox em PRD
     }),
     PrismaModule, // Registra o Prisma primeiro
     ProductsModule,
