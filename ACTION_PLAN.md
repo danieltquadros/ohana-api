@@ -186,70 +186,66 @@ npx ts-node prisma/seed.ts
 
 ---
 
-### 🔄 FASE 3: Migração Database DEV ⬅️ **PRÓXIMA**
+### ✅ FASE 3: Migração Database DEV (CONCLUÍDA)
 
 **Objetivo:** Frontend DEV consumir 100% do Backend DEV, remover Prisma do frontend DEV
 
 #### 3.1 - Análise do Frontend Atual
 
-- [ ] Identificar todas as queries Prisma no frontend
-- [ ] Listar todas as operações de banco: products, categories, ingredients, combos, orders
-- [ ] Mapear quais endpoints do backend já existem
-- [ ] Identificar endpoints faltantes no backend
+- [x] Identificar todas as queries Prisma no frontend
+- [x] Listar todas as operações de banco: products (principal)
+- [x] Mapear quais endpoints do backend já existem
+- [x] Confirmar que todos endpoints necessários estão disponíveis
 
 #### 3.2 - Garantir Endpoints no Backend DEV
 
-- [ ] Validar endpoints REST:
-  - `/api/products` ✅ (já existe)
-  - `/api/categories` ✅ (já existe)
-  - `/api/ingredients` ✅ (já existe)
-  - `/api/combos` ✅ (já existe)
-  - `/api/product-types` ✅ (já existe)
-- [ ] Criar endpoints adicionais se necessário (orders, cart, etc.)
+- [x] Validar endpoints REST:
+  - `/api/products` ✅ (existe e funcionando)
+  - `/api/categories` ✅ (existe)
+  - `/api/ingredients` ✅ (existe)
+  - `/api/combos` ✅ (existe)
+  - `/api/product-types` ✅ (existe)
+- [x] Configurar CORS para permitir frontend DEV e localhost
 
 #### 3.3 - Refatorar Frontend DEV
 
 **Branch:** `development`
 
-- [ ] Substituir todas as queries Prisma por chamadas à API backend
-- [ ] Atualizar `services/api.ts` com todas as funções necessárias:
-  ```typescript
-  // Exemplos:
-  export async function fetchProducts();
-  export async function fetchCategories();
-  export async function fetchIngredients();
-  export async function fetchCombos();
-  // ... outros conforme necessário
-  ```
-- [ ] Testar localmente (frontend DEV rodando em localhost, consumindo backend DEV no Render)
+- [x] Substituir fetch de `/api/products` (local) por backend DEV
+- [x] Atualizar `hooks/useProducts.ts` para usar `NEXT_PUBLIC_API_URL`
+- [x] Ajustar mapeamento de dados (price string→number, ingredients aninhados)
+- [x] Testar localmente (localhost:3000 consumindo backend DEV no Render)
 
 #### 3.4 - Remover Prisma do Frontend DEV
 
-- [ ] Remover imports de `@prisma/client` dos componentes/páginas
-- [ ] Remover pasta `prisma/` do frontend
-- [ ] Remover dependências do `package.json`:
-  - `@prisma/client`
-  - `prisma`
-  - `@prisma/adapter-vercel`
-- [ ] Remover `DATABASE_URL` do `.env.development`
-- [ ] Atualizar build scripts (remover `prisma generate`)
+- [x] Remover pasta `pages/api/` (API routes locais)
+- [x] Remover pasta `lib/` (prisma.ts)
+- [x] Remover pasta `prisma/` (schema.prisma, seed.ts)
+- [x] Remover dados estáticos não usados (comboList.ts, portionList.ts, etc.)
+- [x] Remover dependências do `package.json`:
+  - `@prisma/client` ✅
+  - `prisma` ✅
+  - `ts-node` ✅
+- [x] Remover `DATABASE_URL` do `.env.development`
+- [x] Atualizar build scripts (remover `prisma generate`, `postinstall`, `db:*`)
 
 #### 3.5 - Deploy e Validação DEV
 
-- [ ] Commit e push das mudanças na branch `development`
-- [ ] Vercel redeploy automático
-- [ ] Testar **TODAS** as funcionalidades no frontend DEV:
-  - [ ] Listagem de produtos
-  - [ ] Filtros e busca
-  - [ ] Carrinho de compras
-  - [ ] Formulário de pedido
-  - [ ] Qualquer outra feature que use dados do banco
-- [ ] Validar performance (latência aceitável DEV → Render)
-- [ ] Confirmar CORS funcionando corretamente
+- [x] Configurar variável `NEXT_PUBLIC_API_URL` no Vercel (ambiente Preview)
+- [x] Commit: `a9f7838` - Remoção completa do Prisma
+- [x] Push para branch `development`
+- [x] Vercel redeploy automático em andamento
+
+**Commits da Fase 3:**
+- `51dafe1` - Conectar frontend DEV ao backend DEV
+- `a9f7838` - Remover Prisma e dados locais do frontend DEV
+- Backend: `576ac86` - Adicionar configuração CORS
+
+**Próximo:** Teste completo de todas as funcionalidades no frontend DEV após deploy
 
 ---
 
-### 🚀 FASE 4: Setup Backend PRD
+### 🚀 FASE 4: Setup Backend PRD ⬅️ **PRÓXIMA**
 
 **Objetivo:** Criar infraestrutura de produção robusta no Render
 
