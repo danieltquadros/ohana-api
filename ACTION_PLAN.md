@@ -237,6 +237,7 @@ npx ts-node prisma/seed.ts
 - [x] Vercel redeploy automático em andamento
 
 **Commits da Fase 3:**
+
 - `51dafe1` - Conectar frontend DEV ao backend DEV
 - `a9f7838` - Remover Prisma e dados locais do frontend DEV
 - Backend: `576ac86` - Adicionar configuração CORS
