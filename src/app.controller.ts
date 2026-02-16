@@ -9,4 +9,13 @@ export class AppController {
   getHello(): string {
     return this.appService.getHello();
   }
+
+  /**
+   * Health check endpoint para keep-alive (Vercel Cron)
+   * Responde em: /api/ping (com global prefix)
+   */
+  @Get('ping')
+  getPing() {
+    return this.appService.getPing();
+  }
 }

@@ -43,44 +43,50 @@ PRODUÇÃO (www.ohanasushidelivery.com.br):
 ### Objetivo Final
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                     DESENVOLVIMENTO                     │
-├─────────────────────────────────────────────────────────┤
-│ Frontend DEV                                            │
-│ ├─ URL: dev.ohanasushidelivery.com.br                  │
-│ ├─ Branch: development                                  │
-│ ├─ Deploy: Vercel (preview ou custom domain)           │
-│ └─ PostgreSQL DEV: Vercel Postgres                     │
-│                                                         │
-│ Backend DEV                                             │
-│ ├─ URL: ohana-api-dev.onrender.com                     │
-│ ├─ Branch: main (deploy automático)                    │
-│ ├─ Deploy: Render Web Service (Free Tier)              │
-│ └─ PostgreSQL DEV: Render PostgreSQL (Free Tier)       │
-│                                                         │
-│ Sincronização:                                          │
-│ └─ Frontend DEV consome Backend DEV                    │
-└─────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────┐
+│                       DESENVOLVIMENTO                          │
+├────────────────────────────────────────────────────────────────┤
+│ Frontend DEV                                                   │
+│ ├─ URL: ohana-sushi-delivery-git-development...vercel.app     │
+│ ├─ Branch: development                                         │
+│ ├─ Deploy: Vercel Preview                                      │
+│ └─ Consome: Backend DEV                                        │
+│                                                                │
+│ Backend DEV                                                    │
+│ ├─ URL: https://ohana-api-dev-a7kk.onrender.com               │
+│ ├─ Branch: main (deploy automático)                           │
+│ ├─ Deploy: Render Web Service (Free Tier)                     │
+│ └─ Database: Neon PostgreSQL DEV (Free - 3GB)                 │
+│                                                                │
+│ Sincronização:                                                 │
+│ └─ Frontend DEV → Backend DEV → Neon DEV                      │
+└────────────────────────────────────────────────────────────────┘
 
-┌─────────────────────────────────────────────────────────┐
-│                       PRODUÇÃO                          │
-├─────────────────────────────────────────────────────────┤
-│ Frontend PRD                                            │
-│ ├─ URL: www.ohanasushidelivery.com.br                  │
-│ ├─ Branch: master/main                                  │
-│ ├─ Deploy: Vercel                                       │
-│ └─ PostgreSQL PRD: Vercel Postgres OU migra pro Render │
-│                                                         │
-│ Backend PRD                                             │
-│ ├─ URL: ohana-api.onrender.com                         │
-│ │   (ou api.ohanasushidelivery.com.br via DNS)         │
-│ ├─ Branch: main                                         │
-│ ├─ Deploy: Render Web Service (Paid Tier)              │
-│ └─ PostgreSQL PRD: Render PostgreSQL (Paid, c/ backup) │
-│                                                         │
-│ Sincronização:                                          │
-│ └─ Frontend PRD consome Backend PRD                    │
-└─────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────┐
+│                          PRODUÇÃO                              │
+├────────────────────────────────────────────────────────────────┤
+│ Frontend PRD                                                   │
+│ ├─ URL: www.ohanasushidelivery.com.br                         │
+│ ├─ Branch: master/main                                         │
+│ ├─ Deploy: Vercel Production                                   │
+│ └─ Consome: Backend PRD                                        │
+│                                                                │
+│ Backend PRD                                                    │
+│ ├─ URL: https://ohana-api-prod.onrender.com (a criar)         │
+│ │   (ou api.ohanasushidelivery.com.br via DNS)                │
+│ ├─ Branch: main                                                │
+│ ├─ Deploy: Render Web Service (Free Tier)                     │
+│ └─ Database: Neon PostgreSQL PRD (Free - 3GB)                 │
+│                                                                │
+│ Sincronização:                                                 │
+│ └─ Frontend PRD → Backend PRD → Neon PRD                      │
+└────────────────────────────────────────────────────────────────┘
+
+**🔄 Decisão de Arquitetura:**
+- **Backends:** Render (oferece múltiplos web services gratuitos)
+- **Databases:** Neon (oferece 10 projetos PostgreSQL gratuitos)
+- **Motivo:** Render só fornece 1 database gratuito, insuficiente para DEV+PRD
+- **Tentativa anterior:** Fly.io (abandonado - requer cartão de crédito após 5min)
 ```
 
 ---
@@ -246,57 +252,167 @@ npx ts-node prisma/seed.ts
 
 ---
 
-### 🚀 FASE 4: Setup Backend PRD ⬅️ **PRÓXIMA**
+### 🚀 FASE 4: Migração para Neon + Setup Backend PRD ⬅️ **EM ANDAMENTO**
 
-**Objetivo:** Criar infraestrutura de produção robusta no Render
+**Objetivo:** Migrar databases para Neon (resolve limitação de 1 banco gratuito no Render) e criar ambiente PRD
 
-#### 4.1 - Provisionar PostgreSQL PRD
+**Histórico de decisão:**
 
-- [ ] Dashboard Render → New → PostgreSQL
-- [ ] Nome: `ohana-api-prod-db`
-- [ ] Region: Oregon (US West)
-- [ ] Plano: **Starter** ($7/mês - 1GB, backups diários)
-- [ ] Copiar `Internal Database URL`
+- ✅ Render funcionando para backend DEV
+- ❌ Render só oferece 1 database PostgreSQL gratuito
+- ❌ Fly.io tentado mas requer cartão de crédito (trial 5min)
+- ✅ **Solução:** Neon oferece 10 databases PostgreSQL gratuitos sem cartão
 
-#### 4.2 - Provisionar Web Service PRD
+---
+
+#### 4.1 - Criar Conta e Databases no Neon
+
+**4.1.1 - Criar Conta Neon:**
+
+- [ ] Acessar: https://neon.tech
+- [ ] Sign up com GitHub (danieltquadros)
+- [ ] Verificar email
+
+**4.1.2 - Criar Database DEV:**
+
+- [ ] Dashboard → New Project
+- [ ] Nome: `ohana-dev-db`
+- [ ] Region: **AWS us-east-2** (Ohio) ou **us-east-1** (mais próximo do Brasil)
+- [ ] PostgreSQL Version: 17 (latest)
+- [ ] Plan: **Free Tier** (3GB storage, sempre ativo)
+- [ ] Copiar Connection String:
+  ```
+  postgresql://[user]:[password]@[endpoint-id].us-east-2.aws.neon.tech/[db-name]?sslmode=require
+  ```
+- [ ] Salvar credenciais em local seguro
+
+**4.1.3 - Criar Database PRD:**
+
+- [ ] Dashboard → New Project
+- [ ] Nome: `ohana-prod-db`
+- [ ] Region: **AWS us-east-2** (Ohio) ou **us-east-1**
+- [ ] PostgreSQL Version: 17
+- [ ] Plan: **Free Tier**
+- [ ] Copiar Connection String
+- [ ] Salvar credenciais
+
+---
+
+#### 4.2 - Migrar Backend DEV para Neon
+
+**4.2.1 - Preparação Local:**
+
+- [ ] Criar arquivo `.env.neon-dev` localmente:
+  ```env
+  DATABASE_URL=postgresql://[user]:[password]@[endpoint].neon.tech/[db]?sslmode=require
+  ```
+- [ ] **Não commitar** este arquivo (já está no .gitignore)
+
+**4.2.2 - Executar Migrations no Neon DEV:**
+
+```bash
+# Carregar env vars do Neon DEV
+$env:DATABASE_URL="postgresql://[connection-string-neon-dev]"
+
+# Aplicar migrations
+npx prisma migrate deploy
+
+# Executar seed
+npx tsx prisma/seed.ts
+```
+
+**4.2.3 - Atualizar Render Backend DEV:**
+
+- [ ] Dashboard Render → `ohana-api-dev` → Environment
+- [ ] Atualizar variável `DATABASE_URL`:
+  - **Antigo:** Render PostgreSQL Internal URL
+  - **Novo:** Neon DEV Connection String
+- [ ] Salvar e aguardar redeploy automático
+- [ ] **MANTER banco Render como backup** (não deletar ainda)
+
+**4.2.4 - Validar Backend DEV com Neon:**
+
+- [ ] Acessar: `https://ohana-api-dev-a7kk.onrender.com/api/products`
+- [ ] Verificar se retorna os 25 produtos esperados
+- [ ] Testar no frontend DEV: https://ohana-sushi-delivery-git-development...vercel.app
+- [ ] Verificar logs no Render (sem erros de conexão)
+- [ ] Se OK: Marcar banco Render DEV para remoção futura ✅
+
+---
+
+#### 4.3 - Criar Backend PRD no Render
+
+**4.3.1 - Provisionar Web Service PRD:**
 
 - [ ] Dashboard Render → New → Web Service
 - [ ] Repository: `danieltquadros/ohana-api`
 - [ ] Nome: `ohana-api-prod`
-- [ ] Branch: `main` (mesmo branch, diferencia por env vars)
-- [ ] Region: Oregon
+- [ ] Branch: `main`
+- [ ] Region: **Oregon (US West)** (manter consistência)
 - [ ] Build Command: `npm install && npx prisma generate && npm run build`
 - [ ] Start Command: `npm run start:prod`
-- [ ] Plano: **Starter** ($7/mês - 512MB RAM, sempre ativo)
+- [ ] Plano: **Free Tier** (512MB RAM, cold start após 15min idle)
 
-#### 4.3 - Configurar Environment Variables PRD
+**4.3.2 - Configurar Environment Variables PRD:**
 
-```env
-DATABASE_URL=[Internal Database URL do PostgreSQL PRD]
-NODE_ENV=production
-PORT=3000
-CORS_ORIGIN=https://www.ohanasushidelivery.com.br
+- [ ] No dashboard do Web Service PRD, adicionar:
+  ```env
+  DATABASE_URL=[Neon PRD Connection String]
+  NODE_ENV=production
+  PORT=3000
+  CORS_ORIGIN=https://www.ohanasushidelivery.com.br,https://ohana-sushi-delivery-danieltquadros-projects.vercel.app
+  ```
+
+**4.3.3 - Executar Migrations no Neon PRD:**
+
+```bash
+# Carregar env vars do Neon PRD
+$env:DATABASE_URL="postgresql://[connection-string-neon-prod]"
+
+# Aplicar migrations
+npx prisma migrate deploy
+
+# Executar seed com dados de PRODUÇÃO
+npx tsx prisma/seed.ts
 ```
 
-#### 4.4 - Executar Migration e Seed PRD
+**4.3.4 - Validar Backend PRD:**
 
-- [ ] Localmente, apontar para banco PRD (External URL)
-- [ ] Executar: `npx prisma migrate deploy`
-- [ ] Executar: `npx ts-node prisma/seed.ts` (popula com dados de produção)
-
-#### 4.5 - Validar Backend PRD
-
+- [ ] Aguardar deploy inicial do Render
+- [ ] Copiar URL gerada: `https://ohana-api-prod-[hash].onrender.com`
 - [ ] Acessar: `https://ohana-api-prod-[hash].onrender.com/api/products`
-- [ ] Verificar retorno com produtos
-- [ ] Testar GraphQL: `https://ohana-api-prod-[hash].onrender.com/graphql`
-  - **Apollo Sandbox desabilitado** em PRD ✅ (NODE_ENV=production)
+- [ ] Verificar JSON com 25 produtos
+- [ ] Testar endpoint de health: `/api/ping` ou similar
+- [ ] **Apollo Sandbox deve estar desabilitado** (NODE_ENV=production) ✅
 
-#### 4.6 - Custom Domain PRD (Opcional)
+**4.3.5 - Custom Domain PRD (Opcional - Futuro):**
 
-- [ ] Configurar DNS: `api.ohanasushidelivery.com.br` → Render
-- [ ] No Render, add custom domain
-- [ ] Certificado SSL automático
-- [ ] Atualizar CORS_ORIGIN se necessário
+- [ ] Registrar domínio: `api.ohanasushidelivery.com.br`
+- [ ] Configurar DNS CNAME apontando para Render
+- [ ] No Render, adicionar custom domain
+- [ ] Certificado SSL automático (Let's Encrypt)
+- [ ] Atualizar CORS_ORIGIN após ativação
+
+---
+
+#### 4.4 - Validação Final da Fase 4
+
+**Checklist de Sucesso:**
+
+- [ ] ✅ Backend DEV rodando com Neon DEV
+- [ ] ✅ Backend PRD criado e rodando com Neon PRD
+- [ ] ✅ Ambos backends retornam dados corretos
+- [ ] ✅ Frontend DEV consumindo backend DEV normalmente
+- [ ] ✅ Migrations aplicadas em ambos databases Neon
+- [ ] ✅ Seeds executados com sucesso
+- [ ] ✅ Sem erros de conexão nos logs
+- [ ] ✅ Cold start aceitável (< 60s no free tier)
+
+**Documentação:**
+
+- [ ] Atualizar este ACTION_PLAN com URLs finais
+- [ ] Registrar connection strings do Neon em gerenciador de senhas
+- [ ] Adicionar observações sobre comportamento do cold start
 
 ---
 
@@ -416,7 +532,128 @@ CORS_ORIGIN=https://www.ohanasushidelivery.com.br
 
 ---
 
-## 🛠️ Comando Rápidos
+## � Estratégia Anti-Cold Start (Keep-Alive)
+
+### Problema Identificado
+
+**Free Tiers têm cold start:**
+
+- **Render (Backend)**: Suspende após 15min de inatividade → 30-60s para acordar 🐢
+- **Neon (Database)**: Suspende após 5min de inatividade → 2-5s para acordar ⚡
+- **Total**: ~35-65s de delay na primeira requisição após período de inatividade
+
+### Solução Implementada
+
+**Vercel Cron + Keep-Alive Inteligente**
+
+**Arquivos criados:**
+
+1. `ohana_sushi/app/api/cron/keep-alive-prd/route.ts` - API Route que pinga o backend
+2. `ohana_sushi/vercel.json` - Configuração do cron schedule
+3. `ohana-api/src/app.controller.ts` - Endpoint `/api/ping` para health check
+
+**Estratégia por ambiente:**
+
+```
+DEV (Backend DEV + Database DEV):
+├─ SEM keep-alive (cold start aceitável em desenvolvimento)
+├─ Consumo Render: ~50h/mês (uso esporádico)
+├─ Consumo Neon: ~50h/mês (de 191.9h disponíveis)
+└─ Cold start: ~35-65s após inatividade ✅ OK para DEV
+
+PRD (Backend PRD + Database PRD):
+├─ COM keep-alive via Vercel Cron
+├─ Schedule: */4 0,10-23 * * * (a cada 4min, exceto 1h-10h)
+├─ Horários ativos: 00h-01h + 10h-00h = 15h/dia
+├─ Horário de silêncio: 01h-10h (sem clientes)
+├─ Consumo Render: 450h/mês (de 750h disponíveis) ✅
+├─ Consumo Neon: ~150h/mês (de 191.9h disponíveis) ✅
+└─ Cold start: 0s durante horários de funcionamento ⚡
+```
+
+### Recursos Economizados
+
+**Com janela de silêncio 01h-10h:**
+
+- **24h ativas**: 720h/mês Render → estoura limite de 750h ❌
+- **15h ativas**: 450h/mês Render → **270h de economia** ✅
+- **Total da conta**: DEV (50h) + PRD (450h) = **500h/mês** (~33% abaixo do limite)
+
+### Configuração
+
+**Environment Variable necessária (frontend PRD):**
+
+```env
+# .env.production
+NEXT_PUBLIC_API_URL_PRD=https://ohana-api-prod.onrender.com/api
+```
+
+**Deploy:**
+
+- Vercel detecta `vercel.json` automaticamente
+- Cron ativa após próximo deploy do frontend PRD
+- Logs visíveis em: Vercel Dashboard → Project → Cron Jobs
+
+### Alinhamento com Negócio
+
+**Horários de funcionamento do delivery:**
+
+- Almoço: 11h30-14h30 ✅ (sistema já ativo desde 10h)
+- Jantar: 18h00-23h00 ✅ (100% coberto)
+- Madrugada: 23h-01h ✅ (pedidos tardios cobertos)
+- **Off**: 01h-10h 🌙 (sem clientes, pode dormir)
+
+**Trade-off:**
+
+- Primeiro acesso após 10h: cold start de ~60s ⚠️
+- Impacto: mínimo (1-2x por dia, horário sem movimento)
+- Benefício: 270h/mês economizadas + dentro dos limites ✅
+
+### Monitoramento
+
+**Verificar funcionamento:**
+
+```bash
+# Testar endpoint manualmente
+curl https://ohana-api-prod.onrender.com/api/ping
+
+# Resposta esperada:
+{
+  "status": "ok",
+  "message": "Ohana API is running",
+  "timestamp": "2026-02-16T...",
+  "uptime": 12345.67,
+  "environment": "production"
+}
+```
+
+**Logs do cron:**
+
+- Vercel Dashboard → Seu projeto → Deployments → Cron Jobs
+- Cada execução registra: timestamp, status, duração
+
+**Alertas:**
+
+- Se cron falhar 3x seguidas → Investigar
+- Se uptime do backend < 5min → Keep-alive não está funcionando
+
+### Desativação (quando necessário)
+
+**Quando tráfego real mantiver o backend ativo:**
+
+1. Desabilitar cron: remover entrada de `vercel.json`
+2. Commit e push
+3. Vercel remove cron automaticamente no próximo deploy
+
+**Indicadores para desativar:**
+
+- Tráfego > 100 acessos/dia
+- Backend nunca suspende (uptime > 24h consistente)
+- Custos justificam migração para plano pago
+
+---
+
+## �🛠️ Comando Rápidos
 
 ### Seed (Sincronizar dados do Frontend)
 
@@ -455,6 +692,7 @@ npx prisma studio          # UI do banco
 ### Documentação
 
 - [Render Docs](https://render.com/docs)
+- [Neon Docs](https://neon.tech/docs/introduction)
 - [Vercel Docs](https://vercel.com/docs)
 - [NestJS Docs](https://docs.nestjs.com)
 - [Prisma Docs](https://www.prisma.io/docs)
@@ -462,12 +700,34 @@ npx prisma studio          # UI do banco
 ### Plataformas
 
 - **Render Dashboard:** https://dashboard.render.com
+- **Neon Console:** https://console.neon.tech
 - **Vercel Dashboard:** https://vercel.com/dashboard
 - **GitHub Repo Backend:** https://github.com/danieltquadros/ohana-api
 - **GitHub Repo Frontend:** https://github.com/danieltquadros/ohana_sushi
 
+### Neon PostgreSQL (Database Provider)
+
+**Por que Neon?**
+
+- ✅ 10 projetos PostgreSQL gratuitos (vs. 1 no Render)
+- ✅ Serverless: sem cold start de database
+- ✅ 3GB storage por projeto (free tier)
+- ✅ Branching de databases (útil para testes)
+- ✅ Connection pooling automático
+- ✅ Backups point-in-time incluídos
+- ✅ 100% compatível com PostgreSQL padrão
+- ✅ Sem necessidade de cartão de crédito
+
+**Free Tier Limites:**
+
+- 10 projetos (databases)
+- 3GB storage por projeto
+- Compute: 191.9 horas/mês (suficiente para sempre ativo)
+- Shared CPU
+- Tudo $0/mês permanentemente
+
 ---
 
-**Última atualização:** 14/02/2026  
-**Versão:** 2.0.0  
-**Próximo passo:** Fase 3 - Migração Database DEV (remover Prisma do frontend)
+**Última atualização:** 16/02/2026  
+**Versão:** 3.0.0  
+**Próximo passo:** Fase 4 - Migração para Neon + Setup Backend PRD

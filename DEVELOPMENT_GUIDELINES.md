@@ -82,7 +82,28 @@
 - Limpar código experimental antes de tentar nova abordagem
 - Manter o repositório sempre em estado funcional
 
-### 6. Excelência técnica em primeiro lugar (Portfólio Profissional)
+### 6. Limpeza completa ao abandonar ferramentas/plataformas
+
+**Princípio:** Ao abandonar uma ferramenta, plataforma ou tecnologia, remover **TODOS** os artifacts. Não deixar "lixo" no repositório.
+
+**Checklist de Limpeza:**
+
+- [ ] **Arquivos de configuração** (Dockerfile, fly.toml, vercel.json, etc.)
+- [ ] **Scripts auxiliares** (.dockerignore, entrypoints, deploy scripts)
+- [ ] **Dependências em package.json** (devDependencies e dependencies)
+- [ ] **Variáveis de ambiente** (.env temporários, .env.exemplo obsoletos)
+- [ ] **Código morto** (seeds quebrados, utilities não mais usadas)
+- [ ] **Comentários obsoletos** (TODOs referenciando ferramenta abandonada)
+
+**Exemplo recente:** Ao abandonar o Fly.io e retornar ao Render:
+
+- ❌ **REMOVIDOS:** Dockerfile, .dockerignore, fly.toml, docker-entrypoint.sh, @flydotio/dockerfile
+- ✅ **MANTIDOS:** export-render.ts, import-neon.ts (utilities para migração de dados)
+- 🎯 **Resultado:** Código limpo, sem confusão sobre plataforma atual
+
+**Filosofia:** Repositório limpo = código profissional = melhor para portfólio
+
+### 7. Excelência técnica em primeiro lugar (Portfólio Profissional)
 
 - **SEMPRE escolher a solução mais profissional**, não a mais rápida
 - Se existe uma abordagem tecnicamente superior, **propô-la proativamente**
@@ -92,7 +113,7 @@
 - **Consultoria ativa**: Sugerir melhorias arquiteturais mesmo não solicitadas
 - Explicar por que a solução proposta é considerada "best practice" na indústria
 
-### 7. Priorizar dinamicidade e inteligência do sistema
+### 8. Priorizar dinamicidade e inteligência do sistema
 
 - **Dados dinâmicos > Hardcoded**: Sempre preferir configuração em banco
 - **Sistema inteligente**: Minimizar lógica manual, maximizar automação
@@ -246,5 +267,5 @@ Este documento é **vivo** e deve ser atualizado conforme:
 
 ---
 
-**Última atualização:** 10/02/2026  
-**Versão:** 1.3.0 - Adicionado estratégia de ambientes, deploy e workflow de branches
+**Última atualização:** 13/01/2025  
+**Versão:** 1.4.0 - Adicionada guideline de limpeza de artifacts ao abandonar ferramentas/plataformas
