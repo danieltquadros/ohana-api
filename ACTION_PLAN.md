@@ -26,6 +26,153 @@
 
 - ✅ PR #1 mergeado na `main`
 - ✅ Branch `feature/complete-crud-modules` integrada
+- ✅ Branch `development` criada em ambos repositórios
+- ✅ Branches de features antigas removidas
+
+---
+
+## 🔀 Fluxo de Trabalho Git (Git Flow)
+
+### Estrutura de Branches
+
+**Branches Principais:**
+
+- **`main`** (Backend) / **`master`** (Frontend): Produção - deploy automático para PRD
+- **`development`**: Desenvolvimento - deploy automático para DEV
+
+**Branches Temporárias:**
+
+- **`feature/nome-da-feature`**: Para desenvolvimento de novas funcionalidades
+- **`fix/nome-do-fix`**: Para correções de bugs
+- **`hotfix/nome-do-hotfix`**: Para correções urgentes em produção
+
+### Fluxo de Desenvolvimento Padrão
+
+**Para cada nova tarefa/feature:**
+
+1. **Criar branch a partir de `development`:**
+
+   ```bash
+   git checkout development
+   git pull origin development
+   git checkout -b feature/nome-da-feature
+   ```
+
+2. **Desenvolver e testar localmente:**
+
+   ```bash
+   # Fazer alterações no código
+   npm run test              # Rodar testes
+   npm run build             # Validar build
+   npm run start:dev         # Testar aplicação
+   ```
+
+3. **Commit e push da feature:**
+
+   ```bash
+   git add .
+   git commit -m "feat: descrição da feature"
+   git push origin feature/nome-da-feature
+   ```
+
+4. **Merge com `development` (após testes locais):**
+
+   ```bash
+   git checkout development
+   git pull origin development
+   git merge feature/nome-da-feature
+   git push origin development
+   ```
+
+5. **Testar em ambiente DEV:**
+   - Frontend DEV: aguardar deploy automático no Vercel
+   - Backend DEV: aguardar deploy automático no Render
+   - Validar funcionalidade no ambiente de desenvolvimento
+
+6. **Merge com `main`/`master` (após validação em DEV):**
+
+   ```bash
+   # Backend
+   git checkout main
+   git pull origin main
+   git merge development
+   git push origin main
+
+   # Frontend
+   git checkout master
+   git pull origin master
+   git merge development
+   git push origin master
+   ```
+
+7. **Validar em PRD:**
+   - Frontend PRD: www.ohanasushidelivery.com.br
+   - Backend PRD: https://ohana-api-prd.onrender.com
+
+8. **Limpar branch da feature:**
+   ```bash
+   git branch -d feature/nome-da-feature           # Local
+   git push origin --delete feature/nome-da-feature # Remote
+   ```
+
+### Convenções de Commit
+
+Seguir padrão **Conventional Commits:**
+
+- `feat:` - Nova funcionalidade
+- `fix:` - Correção de bug
+- `docs:` - Alterações em documentação
+- `style:` - Formatação, missing semi colons, etc
+- `refactor:` - Refatoração de código
+- `test:` - Adição ou correção de testes
+- `chore:` - Manutenção, configs, dependencies
+
+**Exemplos:**
+
+```bash
+git commit -m "feat: adicionar upload de imagens de produtos"
+git commit -m "fix: corrigir validação de categoria"
+git commit -m "docs: atualizar README com instruções de deploy"
+git commit -m "refactor: reorganizar estrutura de services"
+```
+
+### Proteção de Branches
+
+**Recomendações para GitHub:**
+
+- Proteger `main`/`master` e `development`
+- Exigir Pull Requests para merge
+- Exigir aprovação de code review
+- Exigir status checks (CI/CD) passando
+- Não permitir force push
+
+### Hotfixes (Urgências em Produção)
+
+Para correções urgentes que não podem esperar o fluxo normal:
+
+```bash
+# Criar hotfix a partir de main/master
+git checkout main  # ou master no frontend
+git pull origin main
+git checkout -b hotfix/descricao-problema
+
+# Fazer correção e testar
+# ...
+
+# Merge direto em main/master
+git checkout main
+git merge hotfix/descricao-problema
+git push origin main
+
+# Merge também em development para sincronizar
+git checkout development
+git merge hotfix/descricao-problema
+git push origin development
+
+# Limpar branch
+git branch -d hotfix/descricao-problema
+git push origin --delete hotfix/descricao-problema
+```
 
 ---
 
