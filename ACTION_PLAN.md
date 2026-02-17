@@ -457,6 +457,7 @@ npx tsx prisma/seed.ts
 - [x] Deploy monitorado e concluído
 
 **Desafios enfrentados:**
+
 - ❌ Vercel não detectava pushes (branch configurada como `main`, código em `master`)
 - ✅ Corrigido com commit vazio para trigger manual
 - ❌ Vercel Cron bloqueado no free tier (só permite 1x/dia)
@@ -478,8 +479,14 @@ npx tsx prisma/seed.ts
 
 - [x] Criado workflow `.github/workflows/keep-alive-prd.yml`
 - [x] Schedule: 00:00-01:00 + 10:00-23:55 (janela de silêncio 01h-10h)
-- [x] Frequência: A cada 5 minutos
+- [x] Frequência: A cada 4 minutos (margem de segurança de 1min para Neon)
 - [x] Testado manualmente com sucesso
+
+**Explicação do intervalo de 4 minutos:**
+- Neon suspende após 5 minutos de inatividade
+- Pingando a cada 4 minutos = margem de 1 minuto de segurança
+- Previne race condition (delays de rede/processing)
+- Garante ZERO cold start durante horários ativos
 
 #### 5.6 - Desativação do Banco Antigo (Pendente)
 
@@ -578,9 +585,10 @@ DEV (Backend DEV + Database DEV):
 
 PRD (Backend PRD + Database PRD):
 ├─ COM keep-alive via GitHub Actions ✅
-├─ Schedule: */5 0 + */5 10-23 (a cada 5min, exceto 1h-10h)
+├─ Schedule: */4 0 + */4 10-23 (a cada 4min, exceto 1h-10h)
 ├─ Horários ativos: 00h-01h + 10h-00h = 15h/dia
 ├─ Horário de silêncio: 01h-10h (sem clientes)
+├─ Frequência: ~225 pings/dia (margem segurança Neon)
 ├─ Consumo Render: 450h/mês (de 750h disponíveis) ✅
 ├─ Consumo Neon: ~150h/mês (de 191.9h disponíveis) ✅
 └─ Cold start: 0s durante horários de funcionamento ⚡
