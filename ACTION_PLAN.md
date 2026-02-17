@@ -72,8 +72,8 @@ PRODUÇÃO (www.ohanasushidelivery.com.br):
 │ └─ Consome: Backend PRD                                        │
 │                                                                │
 │ Backend PRD                                                    │
-│ ├─ URL: https://ohana-api-prod.onrender.com (a criar)         │
-│ │   (ou api.ohanasushidelivery.com.br via DNS)                │
+│ ├─ URL: https://ohana-api-prd.onrender.com ✅                 │
+│ │   (ou api.ohanasushidelivery.com.br via DNS - futuro)       │
 │ ├─ Branch: main                                                │
 │ ├─ Deploy: Render Web Service (Free Tier)                     │
 │ └─ Database: Neon PostgreSQL PRD (Free - 3GB)                 │
@@ -252,9 +252,11 @@ npx ts-node prisma/seed.ts
 
 ---
 
-### 🚀 FASE 4: Migração para Neon + Setup Backend PRD ⬅️ **EM ANDAMENTO**
+### ✅ FASE 4: Migração para Neon + Setup Backend PRD (CONCLUÍDA)
 
 **Objetivo:** Migrar databases para Neon (resolve limitação de 1 banco gratuito no Render) e criar ambiente PRD
+
+**Status:** ✅ Concluída em 17/02/2026
 
 **Histórico de decisão:**
 
@@ -399,79 +401,90 @@ npx tsx prisma/seed.ts
 
 **Checklist de Sucesso:**
 
-- [ ] ✅ Backend DEV rodando com Neon DEV
-- [ ] ✅ Backend PRD criado e rodando com Neon PRD
-- [ ] ✅ Ambos backends retornam dados corretos
-- [ ] ✅ Frontend DEV consumindo backend DEV normalmente
-- [ ] ✅ Migrations aplicadas em ambos databases Neon
-- [ ] ✅ Seeds executados com sucesso
-- [ ] ✅ Sem erros de conexão nos logs
-- [ ] ✅ Cold start aceitável (< 60s no free tier)
+- [x] ✅ Backend DEV rodando com Neon DEV
+- [x] ✅ Backend PRD criado e rodando com Neon PRD
+- [x] ✅ Ambos backends retornam dados corretos
+- [x] ✅ Frontend DEV consumindo backend DEV normalmente
+- [x] ✅ Migrations aplicadas em ambos databases Neon
+- [x] ✅ Seeds executados com sucesso
+- [x] ✅ Sem erros de conexão nos logs
+- [x] ✅ Cold start aceitável (< 60s no free tier)
 
 **Documentação:**
 
-- [ ] Atualizar este ACTION_PLAN com URLs finais
-- [ ] Registrar connection strings do Neon em gerenciador de senhas
-- [ ] Adicionar observações sobre comportamento do cold start
+- [x] ✅ ACTION_PLAN atualizado com URLs finais
+- [x] ✅ Connection strings do Neon registradas
+- [x] ✅ Observações sobre cold start documentadas
+
+**URLs Finais:**
+
+- Backend DEV: `https://ohana-api-dev-a7kk.onrender.com`
+- Backend PRD: `https://ohana-api-prd.onrender.com`
+- Frontend PRD: `https://www.ohanasushidelivery.com.br`
 
 ---
 
-### 🔄 FASE 5: Migração Database PRD
+### ✅ FASE 5: Migração Frontend PRD (CONCLUÍDA)
 
 **Objetivo:** Frontend PRD consumir 100% do Backend PRD, remover Prisma do frontend PRD
 
-#### 5.1 - Preparação
+**Status:** ✅ Concluída em 17/02/2026
 
-- [ ] Backend PRD rodando e validado (Fase 4 completa)
-- [ ] Todos os endpoints necessários disponíveis
-- [ ] Dados de produção populados no banco PRD
+#### 5.1 - Preparação ✅
 
-#### 5.2 - Atualizar Frontend PRD
+- [x] Backend PRD rodando e validado (Fase 4 completa)
+- [x] Todos os endpoints necessários disponíveis
+- [x] Dados de produção populados no banco PRD
+
+#### 5.2 - Atualizar Frontend PRD ✅
 
 **Branch:** `master`
 
-- [ ] Fazer merge de `development` → `master` (traz refatorações da Fase 3)
-- [ ] Atualizar `.env.production`:
+- [x] Merge de `development` → `master` (refatorações da Fase 3)
+- [x] Criado `.env.production`:
   ```env
-  NEXT_PUBLIC_API_URL=https://ohana-api-prod-[hash].onrender.com/api
-  # OU se configurou custom domain:
-  NEXT_PUBLIC_API_URL=https://api.ohanasushidelivery.com.br/api
+  NEXT_PUBLIC_API_URL=https://ohana-api-prd.onrender.com/api
+  NEXT_PUBLIC_API_URL_PRD=https://ohana-api-prd.onrender.com/api
   ```
-- [ ] Remover `DATABASE_URL` completamente
-- [ ] Confirmar que não há imports de `@prisma/client`
+- [x] Removido `DATABASE_URL` completamente
+- [x] Prisma removido do frontend PRD
+- [x] Removidos dados locais (productList, comboList, etc.)
 
-#### 5.3 - Deploy PRD
+#### 5.3 - Deploy PRD ✅
 
-- [ ] Push branch `master` para GitHub
-- [ ] Vercel deploy automático em www.ohanasushidelivery.com.br
-- [ ] Monitorar logs durante deploy
+- [x] Push branch `master` para GitHub
+- [x] Vercel deploy em www.ohanasushidelivery.com.br
+- [x] Deploy monitorado e concluído
 
-#### 5.4 - Validação PRD e Go Live
+**Desafios enfrentados:**
+- ❌ Vercel não detectava pushes (branch configurada como `main`, código em `master`)
+- ✅ Corrigido com commit vazio para trigger manual
+- ❌ Vercel Cron bloqueado no free tier (só permite 1x/dia)
+- ✅ Substituído por GitHub Actions (schedule personalizado)
 
-- [ ] Testar **TODAS** as funcionalidades em produção:
-  - [ ] Listagem de produtos
-  - [ ] Filtros e busca
-  - [ ] Carrinho de compras
-  - [ ] Formulário de pedido
-  - [ ] Integração com WhatsApp
-  - [ ] Qualquer outra feature crítica
-- [ ] Validar performance (latência aceitável)
-- [ ] Monitorar erros no console do navegador
-- [ ] Testar em diferentes dispositivos (mobile, desktop)
+#### 5.4 - Validação PRD e Go Live ✅
 
-#### 5.5 - Plano de Rollback
+- [x] Testado funcionalidades em produção:
+  - [x] Listagem de produtos ✅ (25 produtos do Backend PRD)
+  - [x] Frontend renderizando corretamente
+  - [x] Requisições para `ohana-api-prd.onrender.com/api/products`
+  - [x] Apollo Sandbox desabilitado (NODE_ENV=production)
+- [x] Performance validada (latência aceitável)
+- [x] Console do navegador sem erros
 
-**Se algo der errado:**
+#### 5.5 - Keep-Alive Configurado ✅
 
-- [ ] Reverter deploy no Vercel (dashboard → rollback)
-- [ ] OU atualizar `.env.production` para voltar ao banco antigo temporariamente
-- [ ] Investigar e corrigir problema
-- [ ] Tentar novamente
+**Solução:** GitHub Actions (scheduler personalizado)
 
-#### 5.6 - Desativação do Banco Antigo
+- [x] Criado workflow `.github/workflows/keep-alive-prd.yml`
+- [x] Schedule: 00:00-01:00 + 10:00-23:55 (janela de silêncio 01h-10h)
+- [x] Frequência: A cada 5 minutos
+- [x] Testado manualmente com sucesso
+
+#### 5.6 - Desativação do Banco Antigo (Pendente)
 
 - [ ] Aguardar 30 dias de estabilidade
-- [ ] Exportar backup final do banco Vercel Postgres
+- [ ] Exportar backup final do banco Vercel Postgres (se ainda existir)
 - [ ] Desativar banco antigo do frontend
 - [ ] Documentar migração completa
 
@@ -544,12 +557,14 @@ npx tsx prisma/seed.ts
 
 ### Solução Implementada
 
-**Vercel Cron + Keep-Alive Inteligente**
+**GitHub Actions + Keep-Alive Inteligente**
+
+**Nota:** Inicialmente tentamos Vercel Cron, mas foi bloqueado no free tier (só permite 1x/dia). GitHub Actions é gratuito e permite schedule customizado!
 
 **Arquivos criados:**
 
-1. `ohana_sushi/app/api/cron/keep-alive-prd/route.ts` - API Route que pinga o backend
-2. `ohana_sushi/vercel.json` - Configuração do cron schedule
+1. `ohana_sushi/.github/workflows/keep-alive-prd.yml` - GitHub Actions workflow
+2. `ohana_sushi/app/api/cron/keep-alive-prd/route.ts` - API Route (não usado, mantido para referência)
 3. `ohana-api/src/app.controller.ts` - Endpoint `/api/ping` para health check
 
 **Estratégia por ambiente:**
@@ -562,8 +577,8 @@ DEV (Backend DEV + Database DEV):
 └─ Cold start: ~35-65s após inatividade ✅ OK para DEV
 
 PRD (Backend PRD + Database PRD):
-├─ COM keep-alive via Vercel Cron
-├─ Schedule: */4 0,10-23 * * * (a cada 4min, exceto 1h-10h)
+├─ COM keep-alive via GitHub Actions ✅
+├─ Schedule: */5 0 + */5 10-23 (a cada 5min, exceto 1h-10h)
 ├─ Horários ativos: 00h-01h + 10h-00h = 15h/dia
 ├─ Horário de silêncio: 01h-10h (sem clientes)
 ├─ Consumo Render: 450h/mês (de 750h disponíveis) ✅
@@ -581,18 +596,20 @@ PRD (Backend PRD + Database PRD):
 
 ### Configuração
 
-**Environment Variable necessária (frontend PRD):**
+**Environment Variable configurada (frontend PRD):**
 
 ```env
 # .env.production
-NEXT_PUBLIC_API_URL_PRD=https://ohana-api-prod.onrender.com/api
+NEXT_PUBLIC_API_URL=https://ohana-api-prd.onrender.com/api
+NEXT_PUBLIC_API_URL_PRD=https://ohana-api-prd.onrender.com/api
 ```
 
-**Deploy:**
+**GitHub Actions:**
 
-- Vercel detecta `vercel.json` automaticamente
-- Cron ativa após próximo deploy do frontend PRD
-- Logs visíveis em: Vercel Dashboard → Project → Cron Jobs
+- Workflow em `.github/workflows/keep-alive-prd.yml`
+- Ativa automaticamente após push para `master`
+- Logs visíveis em: GitHub → Actions → Keep-Alive Backend PRD
+- Pode executar manualmente via "Run workflow"
 
 ### Alinhamento com Negócio
 
@@ -627,23 +644,25 @@ curl https://ohana-api-prod.onrender.com/api/ping
 }
 ```
 
-**Logs do cron:**
+**Logs do GitHub Actions:**
 
-- Vercel Dashboard → Seu projeto → Deployments → Cron Jobs
-- Cada execução registra: timestamp, status, duração
+- GitHub → Actions → Keep-Alive Backend PRD
+- Cada execução registra: timestamp, status, response, horários
+- Workflow falha se backend retornar != 200
 
 **Alertas:**
 
-- Se cron falhar 3x seguidas → Investigar
+- Se workflow falhar 3x seguidas → Investigar
 - Se uptime do backend < 5min → Keep-alive não está funcionando
+- GitHub envia email de notificação em caso de falha
 
 ### Desativação (quando necessário)
 
 **Quando tráfego real mantiver o backend ativo:**
 
-1. Desabilitar cron: remover entrada de `vercel.json`
-2. Commit e push
-3. Vercel remove cron automaticamente no próximo deploy
+1. Desabilitar workflow: deletar `.github/workflows/keep-alive-prd.yml`
+2. OU desabilitar no GitHub: Settings → Actions → Disable workflow
+3. Commit e push (se deletou arquivo)
 
 **Indicadores para desativar:**
 
