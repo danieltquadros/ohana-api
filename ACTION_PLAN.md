@@ -483,6 +483,7 @@ npx tsx prisma/seed.ts
 - [x] Testado manualmente com sucesso
 
 **Explicação do intervalo de 4 minutos:**
+
 - Neon suspende após 5 minutos de inatividade
 - Pingando a cada 4 minutos = margem de 1 minuto de segurança
 - Previne race condition (delays de rede/processing)

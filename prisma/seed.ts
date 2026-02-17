@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-
 import 'dotenv/config';
 import { PrismaClient, CategoryType } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
