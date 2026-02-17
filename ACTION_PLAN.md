@@ -827,7 +827,465 @@ curl https://ohana-api-prod.onrender.com/api/ping
 - Custos justificam migração para plano pago
 
 ---
+## 💰 Estratégia de Hospedagem: Free → Paid → Scale
 
+### Conceitos Fundamentais
+
+#### Por que Next.js/NestJS não funciona em hospedagem compartilhada?
+
+**Hospedagem Compartilhada (Hostinger básica):**
+```
+O que é:
+├─ 1 servidor físico dividido entre 100+ clientes
+├─ Serve APENAS arquivos estáticos (HTML, CSS, JS, imagens)
+├─ PHP compartilhado (WordPress, Laravel antigo)
+└─ Sem controle sobre Node.js, processos, etc.
+
+✅ Funciona com:
+├─ HTML/CSS/JS puro (arquivos estáticos)
+├─ WordPress, Joomla
+└─ PHP tradicional
+
+❌ NÃO funciona com:
+├─ Next.js (precisa Node.js rodando 24/7)
+├─ Angular SSR (precisa Node.js)
+├─ NestJS (precisa servidor Node.js)
+└─ Qualquer aplicação moderna com build process
+```
+
+**Solução antiga (2020):** VPS - Você gerencia tudo (Linux, nginx, SSL, backups...)  
+**Solução moderna (2024+):** PaaS - Git push e está no ar (Vercel, Render, Railway)
+
+---
+
+### Tipos de Hospedagem Moderna
+
+#### 1. VPS (Virtual Private Server)
+
+**O que é:**
+- Servidor virtual DEDICADO só para você
+- Controle total: instala o que quiser
+- **VOCÊ é o DevOps**: configura, mantém, monitora, corrige problemas
+
+**Exemplos e Preços:**
+
+| Provider | Plano | Specs | Preço/mês | Indicado para |
+|----------|-------|-------|-----------|---------------|
+| **Hostinger** | VPS 1 | 1 vCore, 4GB RAM | R$ 24 | 1 app pequena |
+| **Hostinger** | VPS 2 | 2 vCore, 8GB RAM | R$ 44 | 2-3 apps médias |
+| **DigitalOcean** | Basic | 1 vCore, 1GB RAM | $6 (~R$ 30) | Aprender DevOps |
+| **DigitalOcean** | Regular | 2 vCore, 2GB RAM | $18 (~R$ 90) | Produção séria |
+| **Hostinger** | VPS 4 | 4 vCore, 16GB RAM | R$ 84 | Múltiplos projetos |
+
+**Prós:**
+- ✅ Controle total (instala qualquer coisa)
+- ✅ Preço fixo previsível
+- ✅ 1 servidor para N projetos
+- ✅ Aprende infraestrutura (currículo++)
+
+**Contras:**
+- ❌ Trabalho inicial: ~10-20h setup
+- ❌ Manutenção: ~2-4h/mês
+- ❌ Você é responsável por segurança
+- ❌ Se der problema 3h da manhã, VOCÊ resolve
+- ❌ Não escala automaticamente
+- ❌ Backups manuais (ou paga extra)
+
+**Responsabilidades:**
+```
+VOCÊ configura e mantém:
+├─ Instalar Node.js, PostgreSQL
+├─ Configurar Nginx/Apache (proxy reverso)
+├─ Configurar SSL (Let's Encrypt)
+├─ Firewall e segurança
+├─ Monitoramento
+├─ Backups
+├─ Atualizações de SO
+└─ Troubleshooting 24/7
+```
+
+---
+
+#### 2. PaaS (Platform as a Service)
+
+**O que é:**
+- Plataforma que cuida de TODA a infraestrutura
+- Você só escreve código e faz `git push`
+- **Zero DevOps**: deploy, SSL, CDN, backups automáticos
+
+**Exemplos e Preços:**
+
+| Provider | Free Tier | Paid Tier | Indicado para |
+|----------|-----------|-----------|---------------|
+| **Vercel** | Unlimited hobby projects | Pro: $20/mês (~R$ 100) | Frontend (Next, React, Vue) |
+| **Render** | 750h/mês web service | Starter: $7/mês (~R$ 35) | Backend (Node, Python, Go) |
+| **Railway** | $5 crédito/mês | Pro: $5 base + uso (~R$ 65) | All-in-one (backend+DB+frontend) |
+| **Neon** | 10 DBs, 3GB each | Pro: $19/mês (~R$ 95) | PostgreSQL Serverless |
+| **Netlify** | 100GB bandwidth | Pro: $19/mês (~R$ 95) | Frontend (SPA, JAMstack) |
+
+**Prós:**
+- ✅ Zero DevOps (foca 100% no código)
+- ✅ Deploy em segundos (`git push`)
+- ✅ SSL/CDN/backups automáticos
+- ✅ Escala automaticamente sob demanda
+- ✅ Suporte 24/7
+- ✅ Rollback com 1 clique
+
+**Contras:**
+- ⚠️ Preço por projeto/uso (pode ficar caro)
+- ⚠️ Menos controle (limitações da plataforma)
+- ⚠️ Lock-in (dependência da plataforma)
+- ⚠️ Cold start em free tiers
+
+---
+
+### Comparação de Custos: Cenários Reais
+
+#### Cenário: Ohana Completo + 2 Portfólios
+
+```
+Stack:
+├─ Ohana Frontend (Next.js)
+├─ Ohana Backend (NestJS)
+├─ Ohana Admin (Angular)
+├─ Database (PostgreSQL)
+├─ Portfólio 1 (Next.js ou estático)
+└─ Portfólio 2 (Next.js ou estático)
+```
+
+---
+
+#### **Opção A: PaaS Mix FREE (Atual)** 🆓
+
+```
+✅ GRÁTIS - Ideal para validação/MVP
+
+Vercel Free:
+├─ Ohana Frontend
+├─ Ohana Admin
+├─ Portfólio 1
+└─ Portfólio 2
+Limitações: 100GB bandwidth/mês, builds podem demorar
+
+Render Free:
+└─ Ohana Backend
+Limitações: Cold start 15min (30-60s acordar)
+
+Neon Free:
+└─ Database (2 projetos: DEV + PRD)
+Limitações: Cold start 5min (2-5s acordar)
+
+TOTAL: R$ 40/ano (apenas domínio)
+Trabalho: Zero DevOps ✅
+Indicado: MVP, validação, aprendizado
+```
+
+---
+
+#### **Opção B: Railway Pro (All-in-One)** 🚀 **[RECOMENDADO]**
+
+```
+💰 ~R$ 65/mês (R$ 780/ano)
+
+Railway Pro ($5 base + uso):
+├─ Subscription: $5/mês
+├─ Backend (512MB RAM): ~$4/mês
+├─ Database (256MB RAM): ~$2/mês
+├─ Admin (se hospedar aqui): ~$2/mês
+└─ TOTAL: ~$13/mês (~R$ 65/mês)
+
+Vercel Free (frontends):
+├─ Ohana Frontend (free)
+├─ Portfólio 1 (free)
+└─ Portfólio 2 (free)
+
+TOTAL: R$ 65/mês (R$ 780/ano)
+Trabalho: Zero DevOps ✅
+Indicado: Produção, múltiplos projetos, orçamento limitado
+
+VANTAGENS:
+✅ Todos os backends/DBs no MESMO plano
+✅ Database incluído (PostgreSQL, Redis, MySQL)
+✅ Não tem cold start
+✅ Preço justo e previsível
+✅ Suporte a monorepos
+✅ Ambientes DEV + PRD no mesmo projeto
+```
+
+---
+
+#### **Opção C: DigitalOcean VPS** 🛠️
+
+```
+💰 ~R$ 90/mês (R$ 1.080/ano)
+
+DigitalOcean Regular ($18/mês):
+├─ 2 vCore, 2GB RAM, 60GB SSD
+├─ Serve Ohana completo + portfólios
+└─ + DigitalOcean Spaces (CDN): $5/mês para estáticos
+
+TOTAL: R$ 95/mês (R$ 1.140/ano)
+Trabalho: ~10-20h setup inicial + ~2-4h/mês manutenção
+Indicado: Quer aprender DevOps, controle total
+
+VANTAGENS:
+✅ Aprende Linux, Docker, Nginx (currículo++)
+✅ Controle total da infraestrutura
+✅ 1 servidor para infinitos projetos
+✅ Excelente documentação (tutoriais)
+
+DESVANTAGENS:
+❌ Você é o DevOps (tempo investido)
+❌ Responsável por segurança e backups
+❌ Curva de aprendizado
+```
+
+---
+
+#### **Opção D: PaaS Premium (Escala)** 💎
+
+```
+💰 ~R$ 230/mês (R$ 2.760/ano)
+
+Vercel Pro: R$ 100/mês
+├─ 100GB bandwidth
+├─ Unlimited builds e serverless functions
+└─ Custom domains ilimitados
+
+Render Starter: R$ 35/mês
+└─ Backend sem cold start
+
+Neon Pro: R$ 95/mês
+├─ 10 databases PostgreSQL
+├─ Unlimited compute (sem cold start)
+└─ 50GB storage
+
+TOTAL: R$ 230/mês (R$ 2.760/ano)
+Trabalho: Zero DevOps ✅
+Indicado: Alto tráfego, vendendo múltiplas cópias, faturamento justifica
+
+QUANDO MIGRAR:
+├─ Vendendo 5+ cópias do Ohana
+├─ Faturamento > R$ 5.000/mês
+├─ Tráfego > 10.000 visitas/mês
+└─ Cold start inaceitável para clientes
+```
+
+---
+
+### Estratégia de Migração Recomendada
+
+```
+🎯 ROADMAP DE HOSPEDAGEM
+
+┌─────────────────────────────────────────────────────────┐
+│ FASE 1: FREE (0-6 meses)                                │
+├─────────────────────────────────────────────────────────┤
+│ Objetivo: Validar, aprender, desenvolver                │
+│ Custo: R$ 40/ano (só domínio)                           │
+│                                                          │
+│ Stack:                                                   │
+│ ├─ Vercel Free (frontends)                              │
+│ ├─ Render Free (backend)                                │
+│ └─ Neon Free (database)                                 │
+│                                                          │
+│ Trade-offs:                                              │
+│ ├─ ✅ Zero custo                                         │
+│ ├─ ✅ Aprende as plataformas                            │
+│ └─ ⚠️ Cold start aceitável (sem clientes reais)        │
+│                                                          │
+│ Gatilhos para migrar:                                   │
+│ ├─ Primeiros clientes pagantes                          │
+│ ├─ Pedidos diários constantes                           │
+│ └─ Cold start vira problema real                        │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│ FASE 2: RAILWAY PRO (6-12 meses)                        │
+├─────────────────────────────────────────────────────────┤
+│ Objetivo: Produção estável, múltiplos projetos          │
+│ Custo: R$ 65/mês (R$ 780/ano)                           │
+│                                                          │
+│ Stack:                                                   │
+│ ├─ Vercel Free (frontends)                              │
+│ ├─ Railway Pro (backend + database)                     │
+│ └─ Neon pode manter free (ou migrar para Railway)       │
+│                                                          │
+│ Trade-offs:                                              │
+│ ├─ ✅ Zero cold start                                    │
+│ ├─ ✅ Preço justo                                        │
+│ ├─ ✅ Todos projetos no mesmo plano                     │
+│ └─ ⚠️ Custo cresce com RAM/CPU (controlável)            │
+│                                                          │
+│ Gatilhos para migrar:                                   │
+│ ├─ Vendendo 3+ cópias do Ohana                          │
+│ ├─ Faturamento > R$ 3.000/mês                           │
+│ └─ Clientes pagando pela hospedagem deles               │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│ FASE 3: PAAS PREMIUM (1+ ano)                           │
+├─────────────────────────────────────────────────────────┤
+│ Objetivo: Escala, multi-tenant, SaaS maduro             │
+│ Custo: R$ 230/mês (R$ 2.760/ano)                        │
+│                                                          │
+│ Stack:                                                   │
+│ ├─ Vercel Pro (todos frontends)                         │
+│ ├─ Render Pro (backends)                                │
+│ └─ Neon Pro ou AWS RDS (database)                       │
+│                                                          │
+│ Trade-offs:                                              │
+│ ├─ ✅ Performance máxima                                │
+│ ├─ ✅ Escala ilimitada                                  │
+│ ├─ ✅ Suporte prioritário                               │
+│ └─ ⚠️ Custo alto (mas justificado por faturamento)     │
+│                                                          │
+│ Indicadores:                                             │
+│ ├─ Vendendo 10+ cópias                                  │
+│ ├─ Faturamento > R$ 10.000/mês                          │
+│ ├─ Tráfego > 50.000 visitas/mês                         │
+│ └─ Cada cliente paga sua hospedagem                     │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Perguntas Frequentes
+
+#### 1. **Comprar no exterior com VPN tem vantagem?**
+
+**NÃO funciona como você imagina!**
+
+```
+Verificações das plataformas:
+├─ Cartão de crédito: país de emissão ⚠️
+├─ CPF/Documento: nacionalidade ⚠️
+├─ Endereço de cobrança: validado ⚠️
+└─ IP (VPN) é o MENOS importante
+
+Exemplo Real:
+├─ Você conecta via VPN (USA)
+├─ Tenta comprar Vercel Pro
+├─ Pede cartão de crédito
+└─ Detecta cartão brasileiro → cobra em R$ do mesmo jeito
+```
+
+**Quando VPN ajuda:**
+- ✅ Acessar dashboard bloqueado no Brasil (raro)
+- ✅ Testar latência de outras regiões
+- ❌ NÃO economiza dinheiro (detectam cartão/CPF)
+
+**Serviços com preço regional (melhor para Brasil):**
+- ✅ **Vercel**: cobra em R$ (sem IOF 5,38%)
+- ⚠️ **Railway**: USD, mas aceita Wise/Payoneer
+- ❌ **AWS/GCP**: USD (IOF + spread bancário)
+
+---
+
+#### 2. **Angular aumenta o custo comparado a Next.js?**
+
+**NÃO! O framework não impacta custo.**
+
+**Como funciona o pricing:**
+
+```
+Vercel Pro ($20/mês): 100GB bandwidth
+
+Você usa:
+├─ Next.js Cliente: 40GB bandwidth
+├─ Angular Admin: 5GB bandwidth
+└─ TOTAL: 45GB (dentro do limite)
+
+OU
+
+├─ Next.js Cliente: 40GB bandwidth
+├─ Next.js Admin: 5GB bandwidth
+└─ TOTAL: 45GB (MESMO CUSTO!)
+```
+
+**O que impacta custo:**
+- ✅ Tráfego total (bandwidth)
+- ✅ Número de builds
+- ✅ Recursos computacionais (serverless functions)
+- ❌ Framework escolhido: **NÃO impacta**
+
+**Conclusão:** Angular vs Next.js é diferença **R$ 0,00**. Escolha pela arquitetura/aprendizado, não por economia.
+
+---
+
+#### 3. **Subdomínio (admin.ohanasushi.com.br) precisa comprar novo domínio?**
+
+**NÃO! Subdomínio é parte do mesmo domínio (GRÁTIS).**
+
+```
+Domínio principal: ohanasushidelivery.com.br (você já tem)
+├─ www.ohanasushidelivery.com.br (já funciona)
+├─ admin.ohanasushidelivery.com.br (GRÁTIS, só configurar DNS)
+├─ api.ohanasushidelivery.com.br (GRÁTIS, só configurar DNS)
+└─ qualquercoisa.ohanasushidelivery.com.br (GRÁTIS)
+```
+
+**Configuração no Vercel/Render:**
+1. Deploy do projeto
+2. Project Settings → Domains
+3. Adicionar: `admin.ohanasushidelivery.com.br`
+4. Copiar registros DNS (CNAME)
+5. Adicionar no provedor do domínio (Registro.br, etc.)
+6. Aguardar propagação (~10min)
+
+**Custo:** R$ 0,00 (incluído no domínio que você já tem)
+
+---
+
+### Linhas de Comando Úteis
+
+#### Railway CLI (quando migrar)
+
+```bash
+# Instalar CLI
+npm install -g @railway/cli
+
+# Login
+railway login
+
+# Criar projeto
+railway init
+
+# Deploy
+git push  # Ou: railway up
+
+# Ver logs
+railway logs
+
+# Abrir dashboard
+railway open
+```
+
+#### DigitalOcean (se escolher VPS)
+
+```bash
+# SSH no droplet
+ssh root@seu-ip
+
+# Atualizar sistema
+apt update && apt upgrade -y
+
+# Instalar Node.js
+curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+apt install -y nodejs
+
+# Instalar PostgreSQL
+apt install -y postgresql postgresql-contrib
+
+# Instalar Nginx
+apt install -y nginx
+
+# Configurar SSL (Let's Encrypt)
+apt install -y certbot python3-certbot-nginx
+certbot --nginx -d ohanasushidelivery.com.br
+```
+
+---
 ## �🛠️ Comando Rápidos
 
 ### Seed (Sincronizar dados do Frontend)
