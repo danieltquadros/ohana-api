@@ -827,6 +827,7 @@ curl https://ohana-api-prod.onrender.com/api/ping
 - Custos justificam migração para plano pago
 
 ---
+
 ## 💰 Estratégia de Hospedagem: Free → Paid → Scale
 
 ### Conceitos Fundamentais
@@ -834,6 +835,7 @@ curl https://ohana-api-prod.onrender.com/api/ping
 #### Por que Next.js/NestJS não funciona em hospedagem compartilhada?
 
 **Hospedagem Compartilhada (Hostinger básica):**
+
 ```
 O que é:
 ├─ 1 servidor físico dividido entre 100+ clientes
@@ -863,27 +865,30 @@ O que é:
 #### 1. VPS (Virtual Private Server)
 
 **O que é:**
+
 - Servidor virtual DEDICADO só para você
 - Controle total: instala o que quiser
 - **VOCÊ é o DevOps**: configura, mantém, monitora, corrige problemas
 
 **Exemplos e Preços:**
 
-| Provider | Plano | Specs | Preço/mês | Indicado para |
-|----------|-------|-------|-----------|---------------|
-| **Hostinger** | VPS 1 | 1 vCore, 4GB RAM | R$ 24 | 1 app pequena |
-| **Hostinger** | VPS 2 | 2 vCore, 8GB RAM | R$ 44 | 2-3 apps médias |
-| **DigitalOcean** | Basic | 1 vCore, 1GB RAM | $6 (~R$ 30) | Aprender DevOps |
-| **DigitalOcean** | Regular | 2 vCore, 2GB RAM | $18 (~R$ 90) | Produção séria |
-| **Hostinger** | VPS 4 | 4 vCore, 16GB RAM | R$ 84 | Múltiplos projetos |
+| Provider         | Plano   | Specs             | Preço/mês    | Indicado para      |
+| ---------------- | ------- | ----------------- | ------------ | ------------------ |
+| **Hostinger**    | VPS 1   | 1 vCore, 4GB RAM  | R$ 24        | 1 app pequena      |
+| **Hostinger**    | VPS 2   | 2 vCore, 8GB RAM  | R$ 44        | 2-3 apps médias    |
+| **DigitalOcean** | Basic   | 1 vCore, 1GB RAM  | $6 (~R$ 30)  | Aprender DevOps    |
+| **DigitalOcean** | Regular | 2 vCore, 2GB RAM  | $18 (~R$ 90) | Produção séria     |
+| **Hostinger**    | VPS 4   | 4 vCore, 16GB RAM | R$ 84        | Múltiplos projetos |
 
 **Prós:**
+
 - ✅ Controle total (instala qualquer coisa)
 - ✅ Preço fixo previsível
 - ✅ 1 servidor para N projetos
 - ✅ Aprende infraestrutura (currículo++)
 
 **Contras:**
+
 - ❌ Trabalho inicial: ~10-20h setup
 - ❌ Manutenção: ~2-4h/mês
 - ❌ Você é responsável por segurança
@@ -892,6 +897,7 @@ O que é:
 - ❌ Backups manuais (ou paga extra)
 
 **Responsabilidades:**
+
 ```
 VOCÊ configura e mantém:
 ├─ Instalar Node.js, PostgreSQL
@@ -909,21 +915,23 @@ VOCÊ configura e mantém:
 #### 2. PaaS (Platform as a Service)
 
 **O que é:**
+
 - Plataforma que cuida de TODA a infraestrutura
 - Você só escreve código e faz `git push`
 - **Zero DevOps**: deploy, SSL, CDN, backups automáticos
 
 **Exemplos e Preços:**
 
-| Provider | Free Tier | Paid Tier | Indicado para |
-|----------|-----------|-----------|---------------|
-| **Vercel** | Unlimited hobby projects | Pro: $20/mês (~R$ 100) | Frontend (Next, React, Vue) |
-| **Render** | 750h/mês web service | Starter: $7/mês (~R$ 35) | Backend (Node, Python, Go) |
-| **Railway** | $5 crédito/mês | Pro: $5 base + uso (~R$ 65) | All-in-one (backend+DB+frontend) |
-| **Neon** | 10 DBs, 3GB each | Pro: $19/mês (~R$ 95) | PostgreSQL Serverless |
-| **Netlify** | 100GB bandwidth | Pro: $19/mês (~R$ 95) | Frontend (SPA, JAMstack) |
+| Provider    | Free Tier                | Paid Tier                   | Indicado para                    |
+| ----------- | ------------------------ | --------------------------- | -------------------------------- |
+| **Vercel**  | Unlimited hobby projects | Pro: $20/mês (~R$ 100)      | Frontend (Next, React, Vue)      |
+| **Render**  | 750h/mês web service     | Starter: $7/mês (~R$ 35)    | Backend (Node, Python, Go)       |
+| **Railway** | $5 crédito/mês           | Pro: $5 base + uso (~R$ 65) | All-in-one (backend+DB+frontend) |
+| **Neon**    | 10 DBs, 3GB each         | Pro: $19/mês (~R$ 95)       | PostgreSQL Serverless            |
+| **Netlify** | 100GB bandwidth          | Pro: $19/mês (~R$ 95)       | Frontend (SPA, JAMstack)         |
 
 **Prós:**
+
 - ✅ Zero DevOps (foca 100% no código)
 - ✅ Deploy em segundos (`git push`)
 - ✅ SSL/CDN/backups automáticos
@@ -932,6 +940,7 @@ VOCÊ configura e mantém:
 - ✅ Rollback com 1 clique
 
 **Contras:**
+
 - ⚠️ Preço por projeto/uso (pode ficar caro)
 - ⚠️ Menos controle (limitações da plataforma)
 - ⚠️ Lock-in (dependência da plataforma)
@@ -1171,11 +1180,13 @@ Exemplo Real:
 ```
 
 **Quando VPN ajuda:**
+
 - ✅ Acessar dashboard bloqueado no Brasil (raro)
 - ✅ Testar latência de outras regiões
 - ❌ NÃO economiza dinheiro (detectam cartão/CPF)
 
 **Serviços com preço regional (melhor para Brasil):**
+
 - ✅ **Vercel**: cobra em R$ (sem IOF 5,38%)
 - ⚠️ **Railway**: USD, mas aceita Wise/Payoneer
 - ❌ **AWS/GCP**: USD (IOF + spread bancário)
@@ -1204,6 +1215,7 @@ OU
 ```
 
 **O que impacta custo:**
+
 - ✅ Tráfego total (bandwidth)
 - ✅ Número de builds
 - ✅ Recursos computacionais (serverless functions)
@@ -1226,6 +1238,7 @@ Domínio principal: ohanasushidelivery.com.br (você já tem)
 ```
 
 **Configuração no Vercel/Render:**
+
 1. Deploy do projeto
 2. Project Settings → Domains
 3. Adicionar: `admin.ohanasushidelivery.com.br`
@@ -1286,6 +1299,7 @@ certbot --nginx -d ohanasushidelivery.com.br
 ```
 
 ---
+
 ## �🛠️ Comando Rápidos
 
 ### Seed (Sincronizar dados do Frontend)
