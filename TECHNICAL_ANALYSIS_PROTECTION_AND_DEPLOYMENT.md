@@ -131,11 +131,11 @@ STAFF (Funcionário Operacional):
 
 **Analogia com empresas reais:**
 
-| Empresa        | SUPER_ADMIN        | ADMIN               | STAFF              |
-| -------------- | ------------------ | ------------------- | ------------------ |
-| Restaurante    | Dono               | Gerente             | Garçom/Cozinheiro  |
-| E-commerce     | CEO/CTO            | Gerente de Produtos | Atendente          |
-| Sistema Ohana  | Proprietário Ohana | Func. de Confiança  | Func. Operacional  |
+| Empresa       | SUPER_ADMIN        | ADMIN               | STAFF             |
+| ------------- | ------------------ | ------------------- | ----------------- |
+| Restaurante   | Dono               | Gerente             | Garçom/Cozinheiro |
+| E-commerce    | CEO/CTO            | Gerente de Produtos | Atendente         |
+| Sistema Ohana | Proprietário Ohana | Func. de Confiança  | Func. Operacional |
 
 ---
 
@@ -166,11 +166,14 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.get<string[]>('roles', context.getHandler());
+    const requiredRoles = this.reflector.get<string[]>(
+      'roles',
+      context.getHandler(),
+    );
     if (!requiredRoles) return true;
-    
+
     const { user } = context.switchToHttp().getRequest();
-    return requiredRoles.some(role => user.role === role);
+    return requiredRoles.some((role) => user.role === role);
   }
 }
 
@@ -180,20 +183,19 @@ export const Roles = (...roles: string[]) => SetMetadata('roles', roles);
 // 3. Proteger endpoints administrativos
 @Controller('products')
 export class ProductController {
-  
   @Get() // Público - todos podem listar
   findAll() {}
-  
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'ADMIN')
   @Post() // Apenas SUPER_ADMIN e ADMIN podem criar
   create() {}
-  
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'ADMIN')
   @Put(':id') // Apenas SUPER_ADMIN e ADMIN podem editar
   update() {}
-  
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN') // Apenas SUPER_ADMIN pode deletar permanentemente
   @Delete(':id')
@@ -391,14 +393,14 @@ Total: ~4-5 semanas para sistema administrativo completo
 
 ## 🎯 Resumo - Minhas Respostas
 
-| Pergunta                                    | Resposta                                                  |
-| ------------------------------------------- | --------------------------------------------------------- |
-| **Subir PRD não impacta?**                  | ✅ Correto - Frontend não usa auth ainda                  |
-| **Proteger rotas agora?**                   | ✅ SIM - É o momento ideal, baixa complexidade            |
-| **Quais roles fazem CRUD?**                 | **SUPER_ADMIN + ADMIN** (STAFF apenas leitura)            |
-| **Subir PRD agora ou proteção primeiro?**   | **Proteção primeiro** (2-3h, vale a pena)                 |
-| **Painel Angular é prioridade?**            | ✅ SIM - Após proteção, é próxima feature mais importante |
-| **Deploy antes ou depois do painel?**       | **Antes** - Mas COM proteção de rotas                     |
+| Pergunta                                  | Resposta                                                  |
+| ----------------------------------------- | --------------------------------------------------------- |
+| **Subir PRD não impacta?**                | ✅ Correto - Frontend não usa auth ainda                  |
+| **Proteger rotas agora?**                 | ✅ SIM - É o momento ideal, baixa complexidade            |
+| **Quais roles fazem CRUD?**               | **SUPER_ADMIN + ADMIN** (STAFF apenas leitura)            |
+| **Subir PRD agora ou proteção primeiro?** | **Proteção primeiro** (2-3h, vale a pena)                 |
+| **Painel Angular é prioridade?**          | ✅ SIM - Após proteção, é próxima feature mais importante |
+| **Deploy antes ou depois do painel?**     | **Antes** - Mas COM proteção de rotas                     |
 
 ---
 
@@ -444,7 +446,8 @@ Total: ~4-5 semanas para sistema administrativo completo
 
 ---
 
-**Decisão do proprietário:** Qual cenário você prefere? 
+**Decisão do proprietário:** Qual cenário você prefere?
+
 - **A) Ideal (recomendado):** Proteção → Deploy PRD → Painel
 - **B) Rápido:** Deploy PRD → Proteção urgente → Painel
 

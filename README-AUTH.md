@@ -104,6 +104,7 @@ model User {
 **Motivação:** Reduzir fricção no checkout, permitindo pedidos apenas com telefone (inspirado em iFood, ClickBus).
 
 **Características do GUEST:**
+
 - ✅ Pode fazer pedidos imediatamente (status `ACTIVE` por padrão)
 - ✅ Identificado apenas por **telefone** (único e obrigatório)
 - ❌ Não possui email nem senha
@@ -113,16 +114,16 @@ model User {
 
 **Diferenças GUEST vs USER:**
 
-| Campo      | GUEST              | USER                    |
-| ---------- | ------------------ | ----------------------- |
-| `email`    | `null`             | Obrigatório             |
-| `password` | `null`             | Obrigatório (hash)      |
-| `phone`    | Obrigatório        | Obrigatório             |
-| `role`     | `GUEST`            | `USER`                  |
-| `status`   | `ACTIVE`           | `PENDING_VERIFICATION`  |
-| Login      | ❌ Bloqueado       | ✅ Permitido            |
-| Pedidos    | ✅ Pode fazer      | ✅ Pode fazer           |
-| Histórico  | ⚠️ Busca por phone | ✅ Completo por userId  |
+| Campo      | GUEST              | USER                   |
+| ---------- | ------------------ | ---------------------- |
+| `email`    | `null`             | Obrigatório            |
+| `password` | `null`             | Obrigatório (hash)     |
+| `phone`    | Obrigatório        | Obrigatório            |
+| `role`     | `GUEST`            | `USER`                 |
+| `status`   | `ACTIVE`           | `PENDING_VERIFICATION` |
+| Login      | ❌ Bloqueado       | ✅ Permitido           |
+| Pedidos    | ✅ Pode fazer      | ✅ Pode fazer          |
+| Histórico  | ⚠️ Busca por phone | ✅ Completo por userId |
 
 **Fluxo de Conversão GUEST → USER:**
 
@@ -367,7 +368,7 @@ Registra novo usuário completo (USER).
   "password": "senha123",
   "firstName": "João",
   "lastName": "Silva",
-  "phone": "(11) 98765-4321"  // Obrigatório
+  "phone": "(11) 98765-4321" // Obrigatório
 }
 ```
 
@@ -427,6 +428,7 @@ Cria usuário GUEST para checkout rápido (sem email/senha).
 ```
 
 **Comportamento Especial:**
+
 - Se telefone já existe como GUEST: retorna usuário existente com novo token
 - Se telefone já existe como USER/ADMIN: erro 409 "Please login"
 - Token JWT contém `phone` ao invés de `email` no payload
@@ -556,11 +558,12 @@ Authorization: Bearer <token-do-guest>
     "role": "USER",
     "status": "PENDING_VERIFICATION"
   },
-  "accessToken": "eyJhbGciOiJIUzI1NiIs..."  // Novo token com email
+  "accessToken": "eyJhbGciOiJIUzI1NiIs..." // Novo token com email
 }
 ```
 
 **Comportamento:**
+
 - Mantém mesmo `userId` (preserva histórico de pedidos)
 - Muda role `GUEST` → `USER`
 - Muda status `ACTIVE` → `PENDING_VERIFICATION`
