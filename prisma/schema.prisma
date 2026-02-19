@@ -135,3 +135,64 @@ model ProductIngredient {
   @@unique([productId, ingredientId])
   @@map("product_ingredients")
 }
+
+enum UserRole {
+  SUPER_ADMIN // Dono/Gerente - controle total do sistema
+  ADMIN // Funcionário admin - gerencia produtos, pedidos, relatórios
+  STAFF // Funcionário operacional - processa pedidos, visualiza dados
+  USER // Cliente - faz pedidos, visualiza histórico
+  GUEST // Cliente sem cadastro - faz pedidos apenas com telefone
+}
+
+enum UserStatus {
+  ACTIVE // Usuário ativo, pode usar o sistema
+  INACTIVE // Inativo (pode reativar)
+  SUSPENDED // Suspenso temporariamente (bloqueado)
+  PENDING_VERIFICATION // Aguardando verificação de email
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  // Identificação
+  email     String? @unique // Opcional para GUEST (apenas telefone)
+  password  String? // Opcional para GUEST (pode converter para USER depois)
+  firstName String
+  lastName  String
+  phone     String  @unique // Obrigatório - identificador principal do GUEST
+  cpf       String? @unique
+
+  // Permissões e Status
+  role   UserRole   @default(USER)
+  status UserStatus @default(PENDING_VERIFICATION)
+
+  // Datas importantes
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastLoginAt     DateTime?
+  emailVerifiedAt DateTime?
+
+  // Auditoria (quem criou/editou este usuário)
+  createdById Int?
+  updatedById Int?
+  createdBy   User? @relation("UserCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy   User? @relation("UserUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  // Soft delete (não remove do banco, apenas marca como deletado)
+  deletedAt   DateTime?
+  deletedById Int?
+  deletedBy   User?     @relation("UserDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
+
+  // Relações (usuários que este usuário criou/editou/deletou)
+  createdUsers User[] @relation("UserCreatedBy")
+  updatedUsers User[] @relation("UserUpdatedBy")
+  deletedUsers User[] @relation("UserDeletedBy")
+
+  // Índices para performance
+  @@index([email])
+  @@index([cpf])
+  @@index([phone])
+  @@index([role])
+  @@index([status])
+  @@map("users")
+}

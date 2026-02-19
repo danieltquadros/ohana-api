@@ -649,11 +649,57 @@ npx tsx prisma/seed.ts
 
 **Objetivo:** Backend com funcionalidades necessárias para produção
 
-#### 6.1 - Autenticação/Autorização
+#### ✅ 6.1 - Autenticação/Autorização (CONCLUÍDA - 19/02/2026)
 
-- [ ] Implementar JWT authentication
-- [ ] Roles: Admin, User
-- [ ] Proteger endpoints administrativos
+**Implementações:**
+
+- ✅ JWT authentication completo (@nestjs/jwt + passport-jwt)
+- ✅ Sistema de Roles hierárquico:
+  - `SUPER_ADMIN`: Controle total do sistema
+  - `ADMIN`: Gerencia produtos, pedidos, relatórios
+  - `STAFF`: Processa pedidos, visualiza dados
+  - `USER`: Cliente - faz pedidos, visualiza histórico
+  - `GUEST`: Cliente sem cadastro - checkout rápido apenas com telefone
+- ✅ Sistema de Status:
+  - `ACTIVE`: Usuário ativo
+  - `INACTIVE`: Inativo (pode reativar)
+  - `SUSPENDED`: Suspenso temporariamente
+  - `PENDING_VERIFICATION`: Aguardando verificação de email
+- ✅ **Sistema GUEST** para checkout sem cadastro obrigatório:
+  - Criar GUEST apenas com telefone + nome (sem email/senha)
+  - Telefone duplicado retorna usuário existente (não dá erro)
+  - Converter GUEST → USER (adiciona email/senha, mantém histórico)
+  - GUEST bloqueado de fazer login (sem senha)
+  - Inspirado em iFood, ClickBus (redução de fricção no checkout)
+- ✅ User Model profissional:
+  - Auditoria completa (createdBy, updatedBy, deletedBy)
+  - Soft delete (mantém histórico)
+  - Índices de performance (email, cpf, phone, role, status)
+  - Validação de formatos (phone, cpf, email)
+- ✅ Segurança:
+  - Hash bcrypt (10 rounds)
+  - JWT com expiração configurável (7 dias default)
+  - Validação de entrada (class-validator)
+- ✅ Endpoints implementados:
+  - `POST /auth/register` - Registro USER completo
+  - `POST /auth/guest` - Registro GUEST rápido
+  - `POST /auth/login` - Login com email/senha
+  - `POST /auth/convert-to-user` - Conversão GUEST → USER
+  - `GET /auth/profile` - Perfil do usuário autenticado
+- ✅ Proteção de rotas via `@UseGuards(JwtAuthGuard)`
+- ✅ Documentação completa: `README-AUTH.md`
+- ✅ Testado localmente: 9/9 testes passando
+- ✅ Mergeado em `development` (commit: 1bea4e8)
+
+**Migration aplicada:**
+
+- `20260218000000_add_guest_role`: Adiciona role GUEST, torna email/password opcionais, phone obrigatório
+
+**Próximos passos:**
+
+- [ ] Proteger endpoints administrativos (produtos, categorias, ingredientes, combos)
+- [ ] Definir permissões por role (SUPER_ADMIN, ADMIN podem CRUD; STAFF apenas leitura)
+- [ ] Implementar Guards customizados: `@RequireRole('ADMIN')`, `@RequireRole('SUPER_ADMIN')`
 
 #### 6.2 - Upload de Imagens
 
@@ -827,6 +873,7 @@ curl https://ohana-api-prod.onrender.com/api/ping
 - Custos justificam migração para plano pago
 
 ---
+
 ## 💰 Estratégia de Hospedagem: Free → Paid → Scale
 
 ### Conceitos Fundamentais
@@ -834,6 +881,7 @@ curl https://ohana-api-prod.onrender.com/api/ping
 #### Por que Next.js/NestJS não funciona em hospedagem compartilhada?
 
 **Hospedagem Compartilhada (Hostinger básica):**
+
 ```
 O que é:
 ├─ 1 servidor físico dividido entre 100+ clientes
@@ -863,27 +911,30 @@ O que é:
 #### 1. VPS (Virtual Private Server)
 
 **O que é:**
+
 - Servidor virtual DEDICADO só para você
 - Controle total: instala o que quiser
 - **VOCÊ é o DevOps**: configura, mantém, monitora, corrige problemas
 
 **Exemplos e Preços:**
 
-| Provider | Plano | Specs | Preço/mês | Indicado para |
-|----------|-------|-------|-----------|---------------|
-| **Hostinger** | VPS 1 | 1 vCore, 4GB RAM | R$ 24 | 1 app pequena |
-| **Hostinger** | VPS 2 | 2 vCore, 8GB RAM | R$ 44 | 2-3 apps médias |
-| **DigitalOcean** | Basic | 1 vCore, 1GB RAM | $6 (~R$ 30) | Aprender DevOps |
-| **DigitalOcean** | Regular | 2 vCore, 2GB RAM | $18 (~R$ 90) | Produção séria |
-| **Hostinger** | VPS 4 | 4 vCore, 16GB RAM | R$ 84 | Múltiplos projetos |
+| Provider         | Plano   | Specs             | Preço/mês    | Indicado para      |
+| ---------------- | ------- | ----------------- | ------------ | ------------------ |
+| **Hostinger**    | VPS 1   | 1 vCore, 4GB RAM  | R$ 24        | 1 app pequena      |
+| **Hostinger**    | VPS 2   | 2 vCore, 8GB RAM  | R$ 44        | 2-3 apps médias    |
+| **DigitalOcean** | Basic   | 1 vCore, 1GB RAM  | $6 (~R$ 30)  | Aprender DevOps    |
+| **DigitalOcean** | Regular | 2 vCore, 2GB RAM  | $18 (~R$ 90) | Produção séria     |
+| **Hostinger**    | VPS 4   | 4 vCore, 16GB RAM | R$ 84        | Múltiplos projetos |
 
 **Prós:**
+
 - ✅ Controle total (instala qualquer coisa)
 - ✅ Preço fixo previsível
 - ✅ 1 servidor para N projetos
 - ✅ Aprende infraestrutura (currículo++)
 
 **Contras:**
+
 - ❌ Trabalho inicial: ~10-20h setup
 - ❌ Manutenção: ~2-4h/mês
 - ❌ Você é responsável por segurança
@@ -892,6 +943,7 @@ O que é:
 - ❌ Backups manuais (ou paga extra)
 
 **Responsabilidades:**
+
 ```
 VOCÊ configura e mantém:
 ├─ Instalar Node.js, PostgreSQL
@@ -909,21 +961,23 @@ VOCÊ configura e mantém:
 #### 2. PaaS (Platform as a Service)
 
 **O que é:**
+
 - Plataforma que cuida de TODA a infraestrutura
 - Você só escreve código e faz `git push`
 - **Zero DevOps**: deploy, SSL, CDN, backups automáticos
 
 **Exemplos e Preços:**
 
-| Provider | Free Tier | Paid Tier | Indicado para |
-|----------|-----------|-----------|---------------|
-| **Vercel** | Unlimited hobby projects | Pro: $20/mês (~R$ 100) | Frontend (Next, React, Vue) |
-| **Render** | 750h/mês web service | Starter: $7/mês (~R$ 35) | Backend (Node, Python, Go) |
-| **Railway** | $5 crédito/mês | Pro: $5 base + uso (~R$ 65) | All-in-one (backend+DB+frontend) |
-| **Neon** | 10 DBs, 3GB each | Pro: $19/mês (~R$ 95) | PostgreSQL Serverless |
-| **Netlify** | 100GB bandwidth | Pro: $19/mês (~R$ 95) | Frontend (SPA, JAMstack) |
+| Provider    | Free Tier                | Paid Tier                   | Indicado para                    |
+| ----------- | ------------------------ | --------------------------- | -------------------------------- |
+| **Vercel**  | Unlimited hobby projects | Pro: $20/mês (~R$ 100)      | Frontend (Next, React, Vue)      |
+| **Render**  | 750h/mês web service     | Starter: $7/mês (~R$ 35)    | Backend (Node, Python, Go)       |
+| **Railway** | $5 crédito/mês           | Pro: $5 base + uso (~R$ 65) | All-in-one (backend+DB+frontend) |
+| **Neon**    | 10 DBs, 3GB each         | Pro: $19/mês (~R$ 95)       | PostgreSQL Serverless            |
+| **Netlify** | 100GB bandwidth          | Pro: $19/mês (~R$ 95)       | Frontend (SPA, JAMstack)         |
 
 **Prós:**
+
 - ✅ Zero DevOps (foca 100% no código)
 - ✅ Deploy em segundos (`git push`)
 - ✅ SSL/CDN/backups automáticos
@@ -932,6 +986,7 @@ VOCÊ configura e mantém:
 - ✅ Rollback com 1 clique
 
 **Contras:**
+
 - ⚠️ Preço por projeto/uso (pode ficar caro)
 - ⚠️ Menos controle (limitações da plataforma)
 - ⚠️ Lock-in (dependência da plataforma)
@@ -1171,11 +1226,13 @@ Exemplo Real:
 ```
 
 **Quando VPN ajuda:**
+
 - ✅ Acessar dashboard bloqueado no Brasil (raro)
 - ✅ Testar latência de outras regiões
 - ❌ NÃO economiza dinheiro (detectam cartão/CPF)
 
 **Serviços com preço regional (melhor para Brasil):**
+
 - ✅ **Vercel**: cobra em R$ (sem IOF 5,38%)
 - ⚠️ **Railway**: USD, mas aceita Wise/Payoneer
 - ❌ **AWS/GCP**: USD (IOF + spread bancário)
@@ -1204,6 +1261,7 @@ OU
 ```
 
 **O que impacta custo:**
+
 - ✅ Tráfego total (bandwidth)
 - ✅ Número de builds
 - ✅ Recursos computacionais (serverless functions)
@@ -1226,6 +1284,7 @@ Domínio principal: ohanasushidelivery.com.br (você já tem)
 ```
 
 **Configuração no Vercel/Render:**
+
 1. Deploy do projeto
 2. Project Settings → Domains
 3. Adicionar: `admin.ohanasushidelivery.com.br`
@@ -1286,6 +1345,7 @@ certbot --nginx -d ohanasushidelivery.com.br
 ```
 
 ---
+
 ## �🛠️ Comando Rápidos
 
 ### Seed (Sincronizar dados do Frontend)

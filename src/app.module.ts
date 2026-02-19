@@ -7,6 +7,7 @@ import { ProductTypesModule } from './product-types/product-types.module';
 import { CategoriesModule } from './categories/categories.module';
 import { IngredientsModule } from './ingredients/ingredients.module';
 import { CombosModule } from './combos/combos.module';
+import { AuthModule } from './auth/auth.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
@@ -21,6 +22,7 @@ import { join } from 'path';
       playground: process.env.NODE_ENV !== 'production', // Desabilita Apollo Sandbox em PRD
     }),
     PrismaModule, // Registra o Prisma primeiro
+    AuthModule, // Authentication module
     ProductsModule,
     ProductTypesModule,
     CategoriesModule,
