@@ -138,27 +138,28 @@ model ProductIngredient {
 
 enum UserRole {
   SUPER_ADMIN // Dono/Gerente - controle total do sistema
-  ADMIN       // Funcionário admin - gerencia produtos, pedidos, relatórios
-  STAFF       // Funcionário operacional - processa pedidos, visualiza dados
-  USER        // Cliente - faz pedidos, visualiza histórico
+  ADMIN // Funcionário admin - gerencia produtos, pedidos, relatórios
+  STAFF // Funcionário operacional - processa pedidos, visualiza dados
+  USER // Cliente - faz pedidos, visualiza histórico
+  GUEST // Cliente sem cadastro - faz pedidos apenas com telefone
 }
 
 enum UserStatus {
-  ACTIVE                 // Usuário ativo, pode usar o sistema
-  INACTIVE               // Inativo (pode reativar)
-  SUSPENDED              // Suspenso temporariamente (bloqueado)
-  PENDING_VERIFICATION   // Aguardando verificação de email
+  ACTIVE // Usuário ativo, pode usar o sistema
+  INACTIVE // Inativo (pode reativar)
+  SUSPENDED // Suspenso temporariamente (bloqueado)
+  PENDING_VERIFICATION // Aguardando verificação de email
 }
 
 model User {
   id Int @id @default(autoincrement())
 
   // Identificação
-  email     String  @unique
-  password  String
+  email     String? @unique // Opcional para GUEST (apenas telefone)
+  password  String? // Opcional para GUEST (pode converter para USER depois)
   firstName String
   lastName  String
-  phone     String? @unique
+  phone     String  @unique // Obrigatório - identificador principal do GUEST
   cpf       String? @unique
 
   // Permissões e Status
@@ -180,7 +181,7 @@ model User {
   // Soft delete (não remove do banco, apenas marca como deletado)
   deletedAt   DateTime?
   deletedById Int?
-  deletedBy   User? @relation("UserDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
+  deletedBy   User?     @relation("UserDeletedBy", fields: [deletedById], references: [id], onDelete: SetNull)
 
   // Relações (usuários que este usuário criou/editou/deletou)
   createdUsers User[] @relation("UserCreatedBy")
