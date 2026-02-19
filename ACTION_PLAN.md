@@ -649,11 +649,57 @@ npx tsx prisma/seed.ts
 
 **Objetivo:** Backend com funcionalidades necessárias para produção
 
-#### 6.1 - Autenticação/Autorização
+#### ✅ 6.1 - Autenticação/Autorização (CONCLUÍDA - 19/02/2026)
 
-- [ ] Implementar JWT authentication
-- [ ] Roles: Admin, User
-- [ ] Proteger endpoints administrativos
+**Implementações:**
+
+- ✅ JWT authentication completo (@nestjs/jwt + passport-jwt)
+- ✅ Sistema de Roles hierárquico:
+  - `SUPER_ADMIN`: Controle total do sistema
+  - `ADMIN`: Gerencia produtos, pedidos, relatórios
+  - `STAFF`: Processa pedidos, visualiza dados
+  - `USER`: Cliente - faz pedidos, visualiza histórico
+  - `GUEST`: Cliente sem cadastro - checkout rápido apenas com telefone
+- ✅ Sistema de Status:
+  - `ACTIVE`: Usuário ativo
+  - `INACTIVE`: Inativo (pode reativar)
+  - `SUSPENDED`: Suspenso temporariamente
+  - `PENDING_VERIFICATION`: Aguardando verificação de email
+- ✅ **Sistema GUEST** para checkout sem cadastro obrigatório:
+  - Criar GUEST apenas com telefone + nome (sem email/senha)
+  - Telefone duplicado retorna usuário existente (não dá erro)
+  - Converter GUEST → USER (adiciona email/senha, mantém histórico)
+  - GUEST bloqueado de fazer login (sem senha)
+  - Inspirado em iFood, ClickBus (redução de fricção no checkout)
+- ✅ User Model profissional:
+  - Auditoria completa (createdBy, updatedBy, deletedBy)
+  - Soft delete (mantém histórico)
+  - Índices de performance (email, cpf, phone, role, status)
+  - Validação de formatos (phone, cpf, email)
+- ✅ Segurança:
+  - Hash bcrypt (10 rounds)
+  - JWT com expiração configurável (7 dias default)
+  - Validação de entrada (class-validator)
+- ✅ Endpoints implementados:
+  - `POST /auth/register` - Registro USER completo
+  - `POST /auth/guest` - Registro GUEST rápido
+  - `POST /auth/login` - Login com email/senha
+  - `POST /auth/convert-to-user` - Conversão GUEST → USER
+  - `GET /auth/profile` - Perfil do usuário autenticado
+- ✅ Proteção de rotas via `@UseGuards(JwtAuthGuard)`
+- ✅ Documentação completa: `README-AUTH.md`
+- ✅ Testado localmente: 9/9 testes passando
+- ✅ Mergeado em `development` (commit: 1bea4e8)
+
+**Migration aplicada:**
+
+- `20260218000000_add_guest_role`: Adiciona role GUEST, torna email/password opcionais, phone obrigatório
+
+**Próximos passos:**
+
+- [ ] Proteger endpoints administrativos (produtos, categorias, ingredientes, combos)
+- [ ] Definir permissões por role (SUPER_ADMIN, ADMIN podem CRUD; STAFF apenas leitura)
+- [ ] Implementar Guards customizados: `@RequireRole('ADMIN')`, `@RequireRole('SUPER_ADMIN')`
 
 #### 6.2 - Upload de Imagens
 
