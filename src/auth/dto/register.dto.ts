@@ -27,12 +27,12 @@ export class RegisterDto {
   @MinLength(2, { message: 'Last name must be at least 2 characters long' })
   lastName!: string;
 
-  @IsOptional()
   @IsString()
+  @IsNotEmpty()
   @Matches(/^\([0-9]{2}\) [0-9]{4,5}-[0-9]{4}$/, {
     message: 'Phone must be in format: (XX) XXXXX-XXXX',
   })
-  phone?: string;
+  phone!: string;
 
   @IsOptional()
   @IsString()
