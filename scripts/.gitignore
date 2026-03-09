@@ -1,0 +1,32 @@
+# Tokens e senhas temporárias
+*.token
+*.secret
+.env.local
+
+# Postman environments e collections (contêm credenciais)
+*.postman_environment.json
+*.postman_collection.json
+
+# Scripts SQL com credenciais (setup de banco, inserts de admin)
+sql/
+
+# Scripts de teste com credenciais
+tests/
+
+# Backups de SQL
+*.backup.sql
+*.bak
+
+# Logs de testes
+test-results.txt
+*.log
+
+# Arquivos temporários do Windows
+Thumbs.db
+desktop.ini
+
+# Arquivos temporários de editor
+*.swp
+*.swo
+*~
+.DS_Store
