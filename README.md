@@ -8,7 +8,7 @@
 
 > Modern REST API for Ohana Sushi menu management system - Built with NestJS, Prisma 7, and PostgreSQL
 
-**Status:** 🚧 Early Development - MVP in Progress
+**Status:** 🟢 Production - MVP Live at [ohanasushidelivery.com.br](https://www.ohanasushidelivery.com.br)
 
 ---
 
@@ -84,20 +84,28 @@ Ohana Sushi API is a modern, scalable REST API designed to manage a sushi restau
   - Linting and build verification
   - Quality gates enforced
 
-### In Progress 🚧
-
-- E2E tests for API endpoints
-- Authentication & authorization
-- Order management system
-
-### Recently Added ✨
-
+- **Authentication & Authorization**
+  - JWT authentication (register, login, profile)
+  - Role-based access control (SUPER_ADMIN, ADMIN, STAFF, USER, GUEST)
+  - Guest checkout system (phone-only, convert to USER)
+  - Protected admin routes (POST/PATCH/DELETE)
+  - See [README-AUTH.md](README-AUTH.md) for details
 - **GraphQL API**
   - Full GraphQL layer alongside REST
   - Code First approach with TypeScript
-  - Interactive playground at `/graphql`
+  - Interactive playground at `/graphql` (disabled in production)
   - Complete CRUD for Products and ProductTypes
   - See [GraphQL Documentation](docs/GRAPHQL.md) for details
+- **Production Deployment**
+  - Dual environments: DEV + PRD (Render + Neon PostgreSQL)
+  - UptimeRobot keep-alive for zero cold-start
+  - Automated deploy via git push
+
+### In Progress 🚧
+
+- Image upload (Cloudinary/S3 integration)
+- Admin Panel (Angular - separate frontend)
+- Order management system
 
 ---
 
@@ -282,20 +290,23 @@ See [DEVELOPMENT_GUIDELINES.md](DEVELOPMENT_GUIDELINES.md) for the complete guid
 
 ## 🔮 Roadmap
 
+### Completed ✅
+
+1. ~~E2E Tests~~ - 65 unit tests + E2E tests passing
+2. ~~GraphQL Layer~~ - Full GraphQL alongside REST
+3. ~~Authentication~~ - JWT + RBAC + Guest system
+4. ~~Deployment~~ - Render + Neon (DEV + PRD)
+5. ~~Environment Separation~~ - DEV/PRD with separate DBs
+
 ### Next Steps (Priority Order)
 
-1. **E2E Tests** - Complete API testing coverage
-2. **GraphQL Layer** - Add GraphQL alongside REST
-3. **Authentication** - JWT-based auth system
-4. **Order Management** - Shopping cart and order processing
-5. **Admin Panel** - Angular-based admin interface
-6. **Deployment** - Deploy to Render.com with CI/CD
-7. **Environment Separation** - Proper DEV/STAGING/PRD environments
+1. **Image Upload** - Cloud storage integration (Cloudinary/S3)
+2. **Admin Panel** - Angular-based admin interface
+3. **Order Management** - Shopping cart and order processing
 
 ### Future Enhancements
 
 - Real-time updates with WebSockets
-- Image upload to cloud storage
 - Multi-language support
 - Analytics dashboard
 - Integration with payment gateways

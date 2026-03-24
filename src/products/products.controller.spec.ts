@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsController } from './products.controller';
 import { ProductsService } from './products.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { UploadService } from '../upload/upload.service';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -21,6 +22,13 @@ describe('ProductsController', () => {
               update: jest.fn(),
               delete: jest.fn(),
             },
+          },
+        },
+        {
+          provide: UploadService,
+          useValue: {
+            uploadImage: jest.fn(),
+            deleteImage: jest.fn(),
           },
         },
       ],

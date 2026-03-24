@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { join } from 'path';
     CategoriesModule,
     IngredientsModule,
     CombosModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

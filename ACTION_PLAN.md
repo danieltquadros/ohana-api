@@ -622,19 +622,17 @@ npx tsx prisma/seed.ts
 
 #### 5.5 - Keep-Alive Configurado ✅
 
-**Solução:** GitHub Actions (scheduler personalizado)
+**Histórico:**
+1. ❌ Vercel Cron - bloqueado no free tier (só permite 1x/dia)
+2. ⚠️ GitHub Actions - funcionou mas desabilitado (commit `d07e1d5`)
+3. ✅ **UptimeRobot** - Solução atual e definitiva
 
-- [x] Criado workflow `.github/workflows/keep-alive-prd.yml`
-- [x] Schedule: 00:00-01:00 + 10:00-23:55 (janela de silêncio 01h-10h)
-- [x] Frequência: A cada 4 minutos (margem de segurança de 1min para Neon)
-- [x] Testado manualmente com sucesso
+**Solução atual:** UptimeRobot (serviço externo gratuito)
 
-**Explicação do intervalo de 4 minutos:**
-
-- Neon suspende após 5 minutos de inatividade
-- Pingando a cada 4 minutos = margem de 1 minuto de segurança
-- Previne race condition (delays de rede/processing)
-- Garante ZERO cold start durante horários ativos
+- [x] Configurado monitor HTTP no UptimeRobot
+- [x] Ping a cada 10 minutos para API PRD (`/api/ping`)
+- [x] GitHub Actions keep-alive desabilitado (migrado para UptimeRobot)
+- [x] Funcionando 24/7 sem consumir minutos do GitHub Actions
 
 #### 5.6 - Desativação do Banco Antigo (Pendente)
 
@@ -645,11 +643,11 @@ npx tsx prisma/seed.ts
 
 ---
 
-### 🔐 FASE 6: Features Essenciais
+### ✅ FASE 6: Features Essenciais (Parcialmente Concluída)
 
 **Objetivo:** Backend com funcionalidades necessárias para produção
 
-#### ✅ 6.1 - Autenticação/Autorização (CONCLUÍDA - 19/02/2026)
+#### ✅ 6.1 - Autenticação/Autorização + RBAC (CONCLUÍDA - 23/02/2026)
 
 **Implementações:**
 
@@ -695,11 +693,14 @@ npx tsx prisma/seed.ts
 
 - `20260218000000_add_guest_role`: Adiciona role GUEST, torna email/password opcionais, phone obrigatório
 
-**Próximos passos:**
+**Proteção de Rotas (RBAC):**
 
-- [ ] Proteger endpoints administrativos (produtos, categorias, ingredientes, combos)
-- [ ] Definir permissões por role (SUPER_ADMIN, ADMIN podem CRUD; STAFF apenas leitura)
-- [ ] Implementar Guards customizados: `@RequireRole('ADMIN')`, `@RequireRole('SUPER_ADMIN')`
+- ✅ RolesGuard + @Roles() decorator implementados
+- ✅ Endpoints administrativos protegidos (POST/PATCH/DELETE)
+- ✅ SUPER_ADMIN + ADMIN podem CRUD; STAFF apenas leitura
+- ✅ Deploy DEV validado (5/5 testes passando)
+- ✅ Deploy PRD concluído e validado (23/02/2026)
+- ✅ Scripts de teste: `scripts/tests/TEST_PRD_AUTH.ps1`
 
 #### 6.2 - Upload de Imagens
 
@@ -758,15 +759,18 @@ npx tsx prisma/seed.ts
 
 ### Solução Implementada
 
-**GitHub Actions + Keep-Alive Inteligente**
+**UptimeRobot (Solução Atual)**
 
-**Nota:** Inicialmente tentamos Vercel Cron, mas foi bloqueado no free tier (só permite 1x/dia). GitHub Actions é gratuito e permite schedule customizado!
+**Histórico de tentativas:**
+1. ❌ Vercel Cron - bloqueado no free tier (só 1x/dia)
+2. ❌ GitHub Actions - funcionou mas desabilitado (consumia minutos, commit `d07e1d5`)
+3. ✅ **UptimeRobot** - Serviço externo gratuito, ping a cada 10min
 
-**Arquivos criados:**
-
-1. `ohana_sushi/.github/workflows/keep-alive-prd.yml` - GitHub Actions workflow
-2. `ohana_sushi/app/api/cron/keep-alive-prd/route.ts` - API Route (não usado, mantido para referência)
-3. `ohana-api/src/app.controller.ts` - Endpoint `/api/ping` para health check
+**Configuração atual:**
+- Serviço: UptimeRobot (plano gratuito)
+- Frequência: Ping a cada 10 minutos
+- Target: `https://ohana-api-prd.onrender.com/api/ping`
+- Endpoint no backend: `ohana-api/src/app.controller.ts` - `/api/ping`
 
 **Estratégia por ambiente:**
 
@@ -778,23 +782,13 @@ DEV (Backend DEV + Database DEV):
 └─ Cold start: ~35-65s após inatividade ✅ OK para DEV
 
 PRD (Backend PRD + Database PRD):
-├─ COM keep-alive via GitHub Actions ✅
-├─ Schedule: */4 0 + */4 10-23 (a cada 4min, exceto 1h-10h)
-├─ Horários ativos: 00h-01h + 10h-00h = 15h/dia
-├─ Horário de silêncio: 01h-10h (sem clientes)
-├─ Frequência: ~225 pings/dia (margem segurança Neon)
-├─ Consumo Render: 450h/mês (de 750h disponíveis) ✅
-├─ Consumo Neon: ~150h/mês (de 191.9h disponíveis) ✅
-└─ Cold start: 0s durante horários de funcionamento ⚡
+├─ COM keep-alive via UptimeRobot ✅
+├─ Frequência: A cada 10 minutos (24/7)
+├─ Serviço: UptimeRobot (gratuito, externo)
+├─ Não consome minutos do GitHub Actions
+├─ Não consome horas do Render (pings são leves)
+└─ Cold start: minimizado durante horários ativos ⚡
 ```
-
-### Recursos Economizados
-
-**Com janela de silêncio 01h-10h:**
-
-- **24h ativas**: 720h/mês Render → estoura limite de 750h ❌
-- **15h ativas**: 450h/mês Render → **270h de economia** ✅
-- **Total da conta**: DEV (50h) + PRD (450h) = **500h/mês** (~33% abaixo do limite)
 
 ### Configuração
 
@@ -806,12 +800,11 @@ NEXT_PUBLIC_API_URL=https://ohana-api-prd.onrender.com/api
 NEXT_PUBLIC_API_URL_PRD=https://ohana-api-prd.onrender.com/api
 ```
 
-**GitHub Actions:**
+**UptimeRobot:**
 
-- Workflow em `.github/workflows/keep-alive-prd.yml`
-- Ativa automaticamente após push para `master`
-- Logs visíveis em: GitHub → Actions → Keep-Alive Backend PRD
-- Pode executar manualmente via "Run workflow"
+- Monitor HTTP configurado no painel UptimeRobot
+- Ping a cada 10 minutos para `/api/ping`
+- GitHub Actions workflow desabilitado (commit `d07e1d5`)
 
 ### Alinhamento com Negócio
 
@@ -846,31 +839,16 @@ curl https://ohana-api-prod.onrender.com/api/ping
 }
 ```
 
-**Logs do GitHub Actions:**
+**Monitoramento (UptimeRobot):**
 
-- GitHub → Actions → Keep-Alive Backend PRD
-- Cada execução registra: timestamp, status, response, horários
-- Workflow falha se backend retornar != 200
+- Dashboard: https://uptimerobot.com/dashboard
+- Alertas por email em caso de downtime
+- Histórico de uptime disponível no painel
 
-**Alertas:**
+**Desativação (quando necessário):**
 
-- Se workflow falhar 3x seguidas → Investigar
-- Se uptime do backend < 5min → Keep-alive não está funcionando
-- GitHub envia email de notificação em caso de falha
-
-### Desativação (quando necessário)
-
-**Quando tráfego real mantiver o backend ativo:**
-
-1. Desabilitar workflow: deletar `.github/workflows/keep-alive-prd.yml`
-2. OU desabilitar no GitHub: Settings → Actions → Disable workflow
-3. Commit e push (se deletou arquivo)
-
-**Indicadores para desativar:**
-
-- Tráfego > 100 acessos/dia
-- Backend nunca suspende (uptime > 24h consistente)
-- Custos justificam migração para plano pago
+- Desativar monitor no painel do UptimeRobot
+- Indicadores para desativar: tráfego > 100 acessos/dia ou migração para plano pago
 
 ---
 
@@ -1421,6 +1399,6 @@ npx prisma studio          # UI do banco
 
 ---
 
-**Última atualização:** 16/02/2026  
-**Versão:** 3.0.0  
-**Próximo passo:** Fase 4 - Migração para Neon + Setup Backend PRD
+**Última atualização:** 09/03/2026
+**Versão:** 4.0.0
+**Próximo passo:** Fase 6.2 - Upload de Imagens → Painel Admin (Angular)
