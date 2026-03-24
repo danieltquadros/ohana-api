@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsService } from './products.service';
 import { PrismaService } from '../prisma/prisma.service';
+import { UploadService } from '../upload/upload.service';
 import { NotFoundException } from '@nestjs/common';
 
 describe('ProductsService', () => {
@@ -13,6 +14,11 @@ describe('ProductsService', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
     },
+  };
+
+  const mockUploadService = {
+    uploadImage: jest.fn(),
+    deleteImage: jest.fn(),
   };
 
   const mockProduct = {
@@ -37,6 +43,10 @@ describe('ProductsService', () => {
         {
           provide: PrismaService,
           useValue: mockPrismaService,
+        },
+        {
+          provide: UploadService,
+          useValue: mockUploadService,
         },
       ],
     }).compile();

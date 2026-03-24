@@ -4,10 +4,14 @@ import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { UploadService } from '../upload/upload.service';
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   async create(createProductInput: CreateProductInput): Promise<Product> {
     return this.prisma.product.create({
@@ -59,11 +63,30 @@ export class ProductsService {
     return product;
   }
 
+  // Extrai o publicId da URL do Cloudinary
+  // Ex: "https://res.cloudinary.com/.../ohana/products/abc123.jpg" → "ohana/products/abc123"
+  private extractPublicId(url: string): string | null {
+    const match = url.match(/\/upload\/(?:v\d+\/)?(.*)\.\w+$/);
+    return match ? match[1] : null;
+  }
+
   async update(
     id: number,
     updateProductInput: UpdateProductInput | UpdateProductDto,
   ): Promise<Product> {
-    await this.findOne(id);
+    const existingProduct = await this.findOne(id);
+
+    // Se a imagem mudou, deletar a antiga do Cloudinary
+    if (
+      updateProductInput.image &&
+      updateProductInput.image !== existingProduct.image &&
+      existingProduct.image.includes('cloudinary')
+    ) {
+      const publicId = this.extractPublicId(existingProduct.image);
+      if (publicId) {
+        await this.uploadService.deleteImage(publicId);
+      }
+    }
 
     return this.prisma.product.update({
       where: { id },
@@ -72,7 +95,15 @@ export class ProductsService {
   }
 
   async remove(id: number): Promise<Product> {
-    await this.findOne(id);
+    const product = await this.findOne(id);
+
+    // Deletar imagem do Cloudinary se existir
+    if (product.image.includes('cloudinary')) {
+      const publicId = this.extractPublicId(product.image);
+      if (publicId) {
+        await this.uploadService.deleteImage(publicId);
+      }
+    }
 
     return this.prisma.product.update({
       where: { id },
