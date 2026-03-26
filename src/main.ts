@@ -10,6 +10,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000', // Desenvolvimento local
       'http://localhost:3001',
+      'http://localhost:4200', // Admin Angular local
       'https://ohana-sushi-delivery-git-development-danieltquadros-projects.vercel.app', // Frontend DEV
       'https://www.ohanasushidelivery.com.br', // Frontend PRD
       'https://ohanasushidelivery.com.br', // Frontend PRD (sem www)
