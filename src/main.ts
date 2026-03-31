@@ -14,6 +14,8 @@ async function bootstrap() {
       'https://ohana-sushi-delivery-git-development-danieltquadros-projects.vercel.app', // Frontend DEV
       'https://www.ohanasushidelivery.com.br', // Frontend PRD
       'https://ohanasushidelivery.com.br', // Frontend PRD (sem www)
+      'https://ohana-admin.vercel.app', // Admin PRD
+      'https://admin.ohanasushidelivery.com.br', // Admin PRD (subdomínio)
     ],
     credentials: true,
   });
