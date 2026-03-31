@@ -12,6 +12,7 @@ async function bootstrap() {
       'http://localhost:3001',
       'http://localhost:4200', // Admin Angular local
       'https://ohana-sushi-delivery-git-development-danieltquadros-projects.vercel.app', // Frontend DEV
+      'https://ohana-admin-git-development-danieltquadros-projects.vercel.app', // Admin DEV
       'https://www.ohanasushidelivery.com.br', // Frontend PRD
       'https://ohanasushidelivery.com.br', // Frontend PRD (sem www)
       'https://ohana-admin.vercel.app', // Admin PRD
