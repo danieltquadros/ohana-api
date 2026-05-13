@@ -4,29 +4,49 @@ import {
   IsInt,
   IsOptional,
   IsBoolean,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class ProductIngredientDto {
+  @IsInt()
+  ingredientId!: number;
+
+  @IsInt()
+  quantity!: number;
+
+  @IsInt()
+  order!: number;
+}
 
 export class CreateProductDto {
   @IsString()
-  title: string;
+  title!: string;
 
   @IsString()
-  image: string;
+  image!: string;
 
   @IsNumber()
-  price: number;
+  price!: number;
 
   @IsInt()
-  order: number;
+  order!: number;
 
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;
 
   @IsInt()
-  productTypeId: number;
+  productTypeId!: number;
 
   @IsInt()
   @IsOptional()
   categoryId?: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProductIngredientDto)
+  @IsOptional()
+  ingredients?: ProductIngredientDto[];
 }

@@ -5,13 +5,36 @@ import {
   IsInt,
   IsOptional,
   IsBoolean,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+@InputType()
+export class ComboProductInput {
+  @Field(() => Int)
+  @IsInt()
+  productId!: number;
+
+  @Field(() => Int)
+  @IsInt()
+  quantity!: number;
+
+  @Field(() => Int)
+  @IsInt()
+  order!: number;
+
+  @Field({ defaultValue: false })
+  @IsBoolean()
+  @IsOptional()
+  isCustomizable?: boolean;
+}
 
 @InputType()
 export class CreateComboInput {
   @Field()
   @IsString()
-  name: string;
+  name!: string;
 
   @Field({ nullable: true })
   @IsString()
@@ -20,15 +43,15 @@ export class CreateComboInput {
 
   @Field()
   @IsString()
-  image: string;
+  image!: string;
 
   @Field(() => Float)
   @IsNumber()
-  price: number;
+  price!: number;
 
   @Field(() => Int)
   @IsInt()
-  order: number;
+  order!: number;
 
   @Field({ defaultValue: true })
   @IsBoolean()
@@ -52,4 +75,11 @@ export class CreateComboInput {
   @IsInt()
   @IsOptional()
   categoryId?: number;
+
+  @Field(() => [ComboProductInput], { nullable: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ComboProductInput)
+  @IsOptional()
+  products?: ComboProductInput[];
 }

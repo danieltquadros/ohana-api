@@ -5,25 +5,42 @@ import {
   IsOptional,
   IsBoolean,
   IsDate,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
+export class ComboProductDto {
+  @IsInt()
+  productId!: number;
+
+  @IsInt()
+  quantity!: number;
+
+  @IsInt()
+  order!: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isCustomizable?: boolean;
+}
+
 export class CreateComboDto {
   @IsString()
-  name: string;
+  name!: string;
 
   @IsString()
   @IsOptional()
   description?: string;
 
   @IsString()
-  image: string;
+  image!: string;
 
   @IsNumber()
-  price: number;
+  price!: number;
 
   @IsInt()
-  order: number;
+  order!: number;
 
   @IsBoolean()
   @IsOptional()
@@ -46,4 +63,10 @@ export class CreateComboDto {
   @IsInt()
   @IsOptional()
   categoryId?: number;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ComboProductDto)
+  @IsOptional()
+  products?: ComboProductDto[];
 }

@@ -5,25 +5,43 @@ import {
   IsInt,
   IsOptional,
   IsBoolean,
+  IsArray,
+  ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+
+@InputType()
+export class ProductIngredientInput {
+  @Field(() => Int)
+  @IsInt()
+  ingredientId!: number;
+
+  @Field(() => Int)
+  @IsInt()
+  quantity!: number;
+
+  @Field(() => Int)
+  @IsInt()
+  order!: number;
+}
 
 @InputType()
 export class CreateProductInput {
   @Field()
   @IsString()
-  title: string;
+  title!: string;
 
   @Field()
   @IsString()
-  image: string;
+  image!: string;
 
   @Field(() => Float)
   @IsNumber()
-  price: number;
+  price!: number;
 
   @Field(() => Int)
   @IsInt()
-  order: number;
+  order!: number;
 
   @Field({ defaultValue: true })
   @IsBoolean()
@@ -32,10 +50,17 @@ export class CreateProductInput {
 
   @Field(() => Int)
   @IsInt()
-  productTypeId: number;
+  productTypeId!: number;
 
   @Field(() => Int, { nullable: true })
   @IsInt()
   @IsOptional()
   categoryId?: number;
+
+  @Field(() => [ProductIngredientInput], { nullable: true })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ProductIngredientInput)
+  @IsOptional()
+  ingredients?: ProductIngredientInput[];
 }
