@@ -13,6 +13,11 @@ describe('CombosService', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
     },
+    comboProduct: {
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
+    },
+    $transaction: jest.fn((callback: any) => callback(mockPrismaService)),
   };
 
   const mockCombo = {
@@ -73,6 +78,13 @@ describe('CombosService', () => {
       expect(result).toEqual(mockCombo);
       expect(mockPrismaService.combo.create).toHaveBeenCalledWith({
         data: createDto,
+        include: {
+          category: true,
+          products: {
+            include: { product: true },
+            orderBy: { order: 'asc' },
+          },
+        },
       });
       expect(mockPrismaService.combo.create).toHaveBeenCalledTimes(1);
     });
@@ -115,6 +127,10 @@ describe('CombosService', () => {
         orderBy: { order: 'asc' },
         include: {
           category: true,
+          products: {
+            include: { product: true },
+            orderBy: { order: 'asc' },
+          },
         },
       });
     });
@@ -249,6 +265,13 @@ describe('CombosService', () => {
       expect(mockPrismaService.combo.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: updateDto,
+        include: {
+          category: true,
+          products: {
+            include: { product: true },
+            orderBy: { order: 'asc' },
+          },
+        },
       });
     });
 

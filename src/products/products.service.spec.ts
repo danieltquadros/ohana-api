@@ -14,6 +14,11 @@ describe('ProductsService', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
     },
+    productIngredient: {
+      deleteMany: jest.fn(),
+      createMany: jest.fn(),
+    },
+    $transaction: jest.fn((callback: any) => callback(mockPrismaService)),
   };
 
   const mockUploadService = {
@@ -78,6 +83,14 @@ describe('ProductsService', () => {
       expect(result).toEqual(mockProduct);
       expect(mockPrismaService.product.create).toHaveBeenCalledWith({
         data: createDto,
+        include: {
+          type: true,
+          category: true,
+          ingredients: {
+            include: { ingredient: true },
+            orderBy: { order: 'asc' },
+          },
+        },
       });
       expect(mockPrismaService.product.create).toHaveBeenCalledTimes(1);
     });
@@ -272,6 +285,14 @@ describe('ProductsService', () => {
       expect(mockPrismaService.product.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: updateDto,
+        include: {
+          type: true,
+          category: true,
+          ingredients: {
+            include: { ingredient: true },
+            orderBy: { order: 'asc' },
+          },
+        },
       });
     });
 
