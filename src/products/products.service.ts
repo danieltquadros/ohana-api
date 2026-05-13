@@ -14,8 +14,31 @@ export class ProductsService {
   ) {}
 
   async create(createProductInput: CreateProductInput): Promise<Product> {
+    const { ingredients, ...productData } = createProductInput;
+
     return this.prisma.product.create({
-      data: createProductInput,
+      data: {
+        ...productData,
+        ...(ingredients && ingredients.length > 0
+          ? {
+              ingredients: {
+                create: ingredients.map((ing) => ({
+                  ingredientId: ing.ingredientId,
+                  quantity: ing.quantity,
+                  order: ing.order,
+                })),
+              },
+            }
+          : {}),
+      },
+      include: {
+        type: true,
+        category: true,
+        ingredients: {
+          include: { ingredient: true },
+          orderBy: { order: 'asc' },
+        },
+      },
     });
   }
 
@@ -88,9 +111,38 @@ export class ProductsService {
       }
     }
 
-    return this.prisma.product.update({
-      where: { id },
-      data: updateProductInput,
+    const { ingredients, ...productData } =
+      updateProductInput as UpdateProductInput;
+
+    return this.prisma.$transaction(async (tx) => {
+      // Se ingredients foi enviado, substituir todos
+      if (ingredients !== undefined) {
+        await tx.productIngredient.deleteMany({ where: { productId: id } });
+
+        if (ingredients.length > 0) {
+          await tx.productIngredient.createMany({
+            data: ingredients.map((ing) => ({
+              productId: id,
+              ingredientId: ing.ingredientId,
+              quantity: ing.quantity,
+              order: ing.order,
+            })),
+          });
+        }
+      }
+
+      return tx.product.update({
+        where: { id },
+        data: productData,
+        include: {
+          type: true,
+          category: true,
+          ingredients: {
+            include: { ingredient: true },
+            orderBy: { order: 'asc' },
+          },
+        },
+      });
     });
   }
 

@@ -39,6 +39,13 @@ type Combo {
   validUntil: DateTime
 }
 
+input ComboProductInput {
+  isCustomizable: Boolean! = false
+  order: Int!
+  productId: Int!
+  quantity: Int!
+}
+
 input CreateCategoryInput {
   description: String
   isActive: Boolean! = true
@@ -56,6 +63,7 @@ input CreateComboInput {
   name: String!
   order: Int!
   price: Float!
+  products: [ComboProductInput!]
   validFrom: DateTime
   validUntil: DateTime
 }
@@ -69,6 +77,7 @@ input CreateIngredientInput {
 input CreateProductInput {
   categoryId: Int
   image: String!
+  ingredients: [ProductIngredientInput!]
   isActive: Boolean! = true
   order: Int!
   price: Float!
@@ -145,6 +154,12 @@ type ProductIngredient {
   updatedAt: DateTime!
 }
 
+input ProductIngredientInput {
+  ingredientId: Int!
+  order: Int!
+  quantity: Int!
+}
+
 type ProductType {
   id: Int!
   inUse: Boolean!
@@ -187,6 +202,7 @@ input UpdateComboInput {
   name: String
   order: Int
   price: Float
+  products: [ComboProductInput!]
   validFrom: DateTime
   validUntil: DateTime
 }
@@ -202,6 +218,7 @@ input UpdateProductInput {
   categoryId: Int
   id: Int!
   image: String
+  ingredients: [ProductIngredientInput!]
   isActive: Boolean = true
   order: Int
   price: Float

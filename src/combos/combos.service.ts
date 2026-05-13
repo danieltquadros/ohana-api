@@ -10,8 +10,31 @@ export class CombosService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createComboInput: CreateComboInput): Promise<Combo> {
+    const { products, ...comboData } = createComboInput;
+
     return this.prisma.combo.create({
-      data: createComboInput,
+      data: {
+        ...comboData,
+        ...(products && products.length > 0
+          ? {
+              products: {
+                create: products.map((p) => ({
+                  productId: p.productId,
+                  quantity: p.quantity,
+                  order: p.order,
+                  isCustomizable: p.isCustomizable ?? false,
+                })),
+              },
+            }
+          : {}),
+      },
+      include: {
+        category: true,
+        products: {
+          include: { product: true },
+          orderBy: { order: 'asc' },
+        },
+      },
     });
   }
 
@@ -21,6 +44,10 @@ export class CombosService {
       orderBy: { order: 'asc' },
       include: {
         category: true,
+        products: {
+          include: { product: true },
+          orderBy: { order: 'asc' },
+        },
       },
     });
   }
@@ -52,9 +79,36 @@ export class CombosService {
   ): Promise<Combo> {
     await this.findOne(id);
 
-    return this.prisma.combo.update({
-      where: { id },
-      data: updateComboInput,
+    const { products, ...comboData } = updateComboInput as UpdateComboInput;
+
+    return this.prisma.$transaction(async (tx) => {
+      if (products !== undefined) {
+        await tx.comboProduct.deleteMany({ where: { comboId: id } });
+
+        if (products.length > 0) {
+          await tx.comboProduct.createMany({
+            data: products.map((p) => ({
+              comboId: id,
+              productId: p.productId,
+              quantity: p.quantity,
+              order: p.order,
+              isCustomizable: p.isCustomizable ?? false,
+            })),
+          });
+        }
+      }
+
+      return tx.combo.update({
+        where: { id },
+        data: comboData,
+        include: {
+          category: true,
+          products: {
+            include: { product: true },
+            orderBy: { order: 'asc' },
+          },
+        },
+      });
     });
   }
 
