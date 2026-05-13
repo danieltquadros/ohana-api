@@ -1,17 +1,39 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateComboInput } from './dto/create-combo.input';
-import { Combo } from '@prisma/client';
-import { UpdateComboInput } from './dto/update-combo.input';
+import { CreateComboDto } from './dto/create-combo.dto';
 import { UpdateComboDto } from './dto/update-combo.dto';
+import { Combo } from '@prisma/client';
 
 @Injectable()
 export class CombosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createComboInput: CreateComboInput): Promise<Combo> {
+  async create(createComboDto: CreateComboDto): Promise<Combo> {
+    const { products, ...comboData } = createComboDto;
+
     return this.prisma.combo.create({
-      data: createComboInput,
+      data: {
+        ...comboData,
+        ...(products && products.length > 0
+          ? {
+              products: {
+                create: products.map((p) => ({
+                  productId: p.productId,
+                  quantity: p.quantity,
+                  order: p.order,
+                  isCustomizable: p.isCustomizable ?? false,
+                })),
+              },
+            }
+          : {}),
+      },
+      include: {
+        category: true,
+        products: {
+          include: { product: true },
+          orderBy: { order: 'asc' },
+        },
+      },
     });
   }
 
@@ -21,6 +43,10 @@ export class CombosService {
       orderBy: { order: 'asc' },
       include: {
         category: true,
+        products: {
+          include: { product: true },
+          orderBy: { order: 'asc' },
+        },
       },
     });
   }
@@ -48,13 +74,40 @@ export class CombosService {
 
   async update(
     id: number,
-    updateComboInput: UpdateComboInput | UpdateComboDto,
+    updateComboDto: UpdateComboDto,
   ): Promise<Combo> {
     await this.findOne(id);
 
-    return this.prisma.combo.update({
-      where: { id },
-      data: updateComboInput,
+    const { products, ...comboData } = updateComboDto;
+
+    return this.prisma.$transaction(async (tx) => {
+      if (products !== undefined) {
+        await tx.comboProduct.deleteMany({ where: { comboId: id } });
+
+        if (products.length > 0) {
+          await tx.comboProduct.createMany({
+            data: products.map((p) => ({
+              comboId: id,
+              productId: p.productId,
+              quantity: p.quantity,
+              order: p.order,
+              isCustomizable: p.isCustomizable ?? false,
+            })),
+          });
+        }
+      }
+
+      return tx.combo.update({
+        where: { id },
+        data: comboData,
+        include: {
+          category: true,
+          products: {
+            include: { product: true },
+            orderBy: { order: 'asc' },
+          },
+        },
+      });
     });
   }
 
