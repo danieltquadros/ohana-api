@@ -8,9 +8,7 @@ import { Ingredient } from '@prisma/client';
 export class IngredientsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    createIngredientDto: CreateIngredientDto,
-  ): Promise<Ingredient> {
+  async create(createIngredientDto: CreateIngredientDto): Promise<Ingredient> {
     return this.prisma.ingredient.create({
       data: createIngredientDto,
     });
