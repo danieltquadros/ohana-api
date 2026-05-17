@@ -1,0 +1,57 @@
+name: UptimeRobot Monday Pause
+
+on:
+  schedule:
+    # Toda segunda-feira às 01:00 BRT (04:00 UTC)
+    - cron: '0 4 * * 1'
+    # Toda terça-feira às 08:00 BRT (11:00 UTC)
+    - cron: '0 11 * * 2'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - pause
+          - resume
+
+jobs:
+  manage-monitor:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine action
+        id: action
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "status=${{ github.event.inputs.action == 'pause' && '0' || '1' }}" >> $GITHUB_OUTPUT
+            echo "label=${{ github.event.inputs.action }}" >> $GITHUB_OUTPUT
+          else
+            # Cron: segunda (04:00 UTC) = pause, terça (11:00 UTC) = resume
+            HOUR=$(date -u +%H)
+            DAY=$(date -u +%u)
+            if [ "$DAY" = "1" ]; then
+              echo "status=0" >> $GITHUB_OUTPUT
+              echo "label=pause" >> $GITHUB_OUTPUT
+            else
+              echo "status=1" >> $GITHUB_OUTPUT
+              echo "label=resume" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: ${{ steps.action.outputs.label }} UptimeRobot monitor
+        run: |
+          RESPONSE=$(curl -s -X POST \
+            https://api.uptimerobot.com/v2/editMonitor \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "api_key=${{ secrets.UPTIMEROBOT_API_KEY }}&id=${{ secrets.UPTIMEROBOT_MONITOR_ID }}&status=${{ steps.action.outputs.status }}")
+
+          echo "Response: $RESPONSE"
+
+          STATUS=$(echo $RESPONSE | jq -r '.stat')
+          if [ "$STATUS" = "ok" ]; then
+            echo "✅ Monitor ${{ steps.action.outputs.label }}d successfully"
+          else
+            echo "❌ Failed to ${{ steps.action.outputs.label }} monitor"
+            exit 1
+          fi

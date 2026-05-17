@@ -1,19 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateIngredientInput } from './dto/create-ingredient.input';
-import { UpdateIngredientInput } from './dto/update-ingredient.input';
-import { Ingredient } from '@prisma/client';
+import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
+import { Ingredient } from '@prisma/client';
 
 @Injectable()
 export class IngredientsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    createIngredientInput: CreateIngredientInput,
-  ): Promise<Ingredient> {
+  async create(createIngredientDto: CreateIngredientDto): Promise<Ingredient> {
     return this.prisma.ingredient.create({
-      data: createIngredientInput,
+      data: createIngredientDto,
     });
   }
 
@@ -44,13 +41,13 @@ export class IngredientsService {
 
   async update(
     id: number,
-    updateIngredientInput: UpdateIngredientInput | UpdateIngredientDto,
+    updateIngredientDto: UpdateIngredientDto,
   ): Promise<Ingredient> {
     await this.findOne(id);
 
     return this.prisma.ingredient.update({
       where: { id },
-      data: updateIngredientInput,
+      data: updateIngredientDto,
     });
   }
 

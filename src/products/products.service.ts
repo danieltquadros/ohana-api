@@ -1,9 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateProductInput } from './dto/create-product.input';
-import { UpdateProductInput } from './dto/update-product.input';
-import { Product } from '@prisma/client';
+import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { Product } from '@prisma/client';
 import { UploadService } from '../upload/upload.service';
 
 @Injectable()
@@ -13,8 +12,8 @@ export class ProductsService {
     private readonly uploadService: UploadService,
   ) {}
 
-  async create(createProductInput: CreateProductInput): Promise<Product> {
-    const { ingredients, ...productData } = createProductInput;
+  async create(createProductDto: CreateProductDto): Promise<Product> {
+    const { ingredients, ...productData } = createProductDto;
 
     return this.prisma.product.create({
       data: {
@@ -95,14 +94,14 @@ export class ProductsService {
 
   async update(
     id: number,
-    updateProductInput: UpdateProductInput | UpdateProductDto,
+    updateProductDto: UpdateProductDto,
   ): Promise<Product> {
     const existingProduct = await this.findOne(id);
 
     // Se a imagem mudou, deletar a antiga do Cloudinary
     if (
-      updateProductInput.image &&
-      updateProductInput.image !== existingProduct.image &&
+      updateProductDto.image &&
+      updateProductDto.image !== existingProduct.image &&
       existingProduct.image.includes('cloudinary')
     ) {
       const publicId = this.extractPublicId(existingProduct.image);
@@ -111,8 +110,7 @@ export class ProductsService {
       }
     }
 
-    const { ingredients, ...productData } =
-      updateProductInput as UpdateProductInput;
+    const { ingredients, ...productData } = updateProductDto;
 
     return this.prisma.$transaction(async (tx) => {
       // Se ingredients foi enviado, substituir todos
