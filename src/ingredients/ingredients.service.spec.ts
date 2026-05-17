@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { IngredientsService } from './ingredients.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('IngredientsService', () => {
   let service: IngredientsService;
@@ -13,6 +13,9 @@ describe('IngredientsService', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
+    },
+    productIngredient: {
+      count: jest.fn(),
     },
   };
 
@@ -220,27 +223,31 @@ describe('IngredientsService', () => {
   });
 
   describe('remove', () => {
-    it('should delete an ingredient', async () => {
+    it('should delete an ingredient when not in use', async () => {
       mockPrismaService.ingredient.findUnique.mockResolvedValue(mockIngredient);
+      mockPrismaService.productIngredient.count.mockResolvedValue(0);
       mockPrismaService.ingredient.delete.mockResolvedValue(mockIngredient);
 
       const result = await service.remove(1);
 
       expect(result).toEqual(mockIngredient);
-      expect(mockPrismaService.ingredient.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 },
-        include: {
-          products: {
-            include: {
-              product: true,
-              ingredient: true,
-            },
-          },
-        },
+      expect(mockPrismaService.productIngredient.count).toHaveBeenCalledWith({
+        where: { ingredientId: 1 },
       });
       expect(mockPrismaService.ingredient.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       });
+    });
+
+    it('should throw ConflictException when ingredient is in use', async () => {
+      mockPrismaService.ingredient.findUnique.mockResolvedValue(mockIngredient);
+      mockPrismaService.productIngredient.count.mockResolvedValue(3);
+
+      await expect(service.remove(1)).rejects.toThrow(ConflictException);
+      await expect(service.remove(1)).rejects.toThrow(
+        'Não é possível excluir este ingrediente pois está sendo usado em 3 produto(s).',
+      );
+      expect(mockPrismaService.ingredient.delete).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when removing non-existent ingredient', async () => {
