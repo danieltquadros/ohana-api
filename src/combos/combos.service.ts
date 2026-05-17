@@ -1,16 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateComboInput } from './dto/create-combo.input';
-import { Combo } from '@prisma/client';
-import { UpdateComboInput } from './dto/update-combo.input';
+import { CreateComboDto } from './dto/create-combo.dto';
 import { UpdateComboDto } from './dto/update-combo.dto';
+import { Combo } from '@prisma/client';
 
 @Injectable()
 export class CombosService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createComboInput: CreateComboInput): Promise<Combo> {
-    const { products, ...comboData } = createComboInput;
+  async create(createComboDto: CreateComboDto): Promise<Combo> {
+    const { products, ...comboData } = createComboDto;
 
     return this.prisma.combo.create({
       data: {
@@ -73,13 +72,10 @@ export class CombosService {
     return combo;
   }
 
-  async update(
-    id: number,
-    updateComboInput: UpdateComboInput | UpdateComboDto,
-  ): Promise<Combo> {
+  async update(id: number, updateComboDto: UpdateComboDto): Promise<Combo> {
     await this.findOne(id);
 
-    const { products, ...comboData } = updateComboInput as UpdateComboInput;
+    const { products, ...comboData } = updateComboDto;
 
     return this.prisma.$transaction(async (tx) => {
       if (products !== undefined) {
