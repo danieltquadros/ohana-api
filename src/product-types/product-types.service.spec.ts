@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { ProductTypesService } from './product-types.service';
 import { PrismaService } from '../prisma/prisma.service';
 
@@ -19,6 +20,9 @@ describe('ProductTypesService', () => {
               create: jest.fn(),
               update: jest.fn(),
               delete: jest.fn(),
+            },
+            product: {
+              count: jest.fn(),
             },
           },
         },
@@ -134,23 +138,45 @@ describe('ProductTypesService', () => {
   });
 
   describe('remove', () => {
-    it('should delete and return the product type', async () => {
-      // Arrange
-      const mockDeletedType = { id: 1, name: 'Combos', order: 1 };
+    it('should delete the product type when not in use', async () => {
+      const mockType = { id: 1, name: 'Combos', order: 1 };
 
       jest
+        .spyOn(prisma.productType, 'findUnique')
+        .mockResolvedValue(mockType as any);
+      jest.spyOn(prisma.product, 'count').mockResolvedValue(0);
+      jest
         .spyOn(prisma.productType, 'delete')
-        .mockResolvedValue(mockDeletedType as any);
+        .mockResolvedValue(mockType as any);
 
-      // Act
       const result = await service.remove(1);
 
-      // Assert
-      expect(result).toEqual(mockDeletedType);
-      expect(prisma.productType.delete).toHaveBeenCalledTimes(1);
+      expect(result).toEqual(mockType);
+      expect(prisma.product.count).toHaveBeenCalledWith({
+        where: { productTypeId: 1, isActive: true },
+      });
       expect(prisma.productType.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       });
+    });
+
+    it('should throw ConflictException when product type is in use', async () => {
+      const mockType = { id: 1, name: 'Combos', order: 1 };
+
+      jest
+        .spyOn(prisma.productType, 'findUnique')
+        .mockResolvedValue(mockType as any);
+      jest.spyOn(prisma.product, 'count').mockResolvedValue(5);
+
+      await expect(service.remove(1)).rejects.toThrow(ConflictException);
+      expect(prisma.productType.delete).not.toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundException when product type does not exist', async () => {
+      jest.spyOn(prisma.productType, 'findUnique').mockResolvedValue(null);
+
+      await expect(service.remove(999)).rejects.toThrow(NotFoundException);
+      expect(prisma.productType.delete).not.toHaveBeenCalled();
     });
   });
 });

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -146,6 +150,19 @@ export class ProductsService {
 
   async remove(id: number): Promise<Product> {
     const product = await this.findOne(id);
+
+    const activeComboUsage = await this.prisma.comboProduct.count({
+      where: {
+        productId: id,
+        combo: { isActive: true },
+      },
+    });
+
+    if (activeComboUsage > 0) {
+      throw new ConflictException(
+        `Não é possível excluir este produto pois está sendo usado em ${activeComboUsage} combo(s) ativo(s).`,
+      );
+    }
 
     // Deletar imagem do Cloudinary se existir
     if (product.image.includes('cloudinary')) {
