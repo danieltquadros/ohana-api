@@ -1,417 +1,173 @@
-# 🍣 Ohana Sushi API
+# ⚙️ Ohana Sushi API
 
 [![CI Status](https://github.com/danieltquadros/ohana-api/actions/workflows/ci.yml/badge.svg)](https://github.com/danieltquadros/ohana-api/actions/workflows/ci.yml)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
-[![NestJS](https://img.shields.io/badge/NestJS-11.0-red.svg)](https://nestjs.com/)
-[![Prisma](https://img.shields.io/badge/Prisma-7.2-teal.svg)](https://www.prisma.io/)
+[![NestJS](https://img.shields.io/badge/NestJS-11-E0234E?logo=nestjs&logoColor=white)](https://nestjs.com/)
+[![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-> Modern REST API for Ohana Sushi menu management system - Built with NestJS, Prisma 7, and PostgreSQL
+> REST API for the Ohana Sushi delivery system.
+> Built with NestJS, Prisma 7, and PostgreSQL.
 
-**Status:** 🟢 Production - MVP Live at [ohanasushidelivery.com.br](https://www.ohanasushidelivery.com.br)
+**Status:** 🟢 Production — Live at [ohanasushidelivery.com.br](https://www.ohanasushidelivery.com.br)
 
 ---
 
 ## 📋 Table of Contents
 
-- [About](#about)
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Running Tests](#running-tests)
-- [API Documentation](#api-documentation)
-- [Project Structure](#project-structure)
-- [Development Guidelines](#development-guidelines)
-- [Roadmap](#roadmap)
+- [About](#-about)
+- [Tech Stack](#%EF%B8%8F-tech-stack)
+- [Features](#-features)
+- [Getting Started](#-getting-started)
+- [Environment Variables](#-environment-variables)
+- [Testing](#-testing)
+- [Project Structure](#%EF%B8%8F-project-structure)
+- [Available Scripts](#-available-scripts)
+- [Deployment](#%EF%B8%8F-deployment)
+- [License](#-license)
 
 ---
 
 ## 🎯 About
 
-Ohana Sushi API is a modern, scalable REST API designed to manage a sushi restaurant's menu system. Built with enterprise-grade technologies and best practices, this project demonstrates:
+This repository is part of the **Ohana Sushi** project — a full-stack delivery system currently in active commercial use.
 
-- ✅ Clean Architecture with dependency injection
+The full project consists of three integrated applications:
+
+- 🛒 **[ohana_sushi](https://github.com/danieltquadros/ohana_sushi)** — Customer storefront — Next.js
+- ⚙️ **[ohana-api](https://github.com/danieltquadros/ohana-api)** — REST API backend (this repository) — NestJS
+- 🎛️ **[ohana-admin](https://github.com/danieltquadros/ohana-admin)** — Admin panel — Angular
+
+This backend exposes a REST API for product catalog, authentication, and order management.
+
+### Highlights
+
+- ✅ Clean architecture with dependency injection
 - ✅ Database-first design with Prisma ORM
-- ✅ Comprehensive unit testing (Jest)
+- ✅ JWT authentication + RBAC (5 hierarchical levels)
+- ✅ 65+ unit tests (Jest)
 - ✅ Automated CI/CD pipeline
 - ✅ Type-safe development with TypeScript
-- ✅ Input validation and error handling
+- ✅ Image upload via Cloudinary
+- ✅ Multi-environment deployment (DEV/PRD)
 
-**Project Origin:** Brazilian restaurant digitalization initiative
+## 🛠️ Tech Stack
 
----
-
-## 🚀 Tech Stack
-
-### Core Technologies
-
-- **[NestJS 11](https://nestjs.com/)** - Progressive Node.js framework
-- **[TypeScript 5.7](https://www.typescriptlang.org/)** - Type-safe JavaScript
-- **[Prisma 7](https://www.prisma.io/)** - Next-generation ORM
-- **[PostgreSQL](https://www.postgresql.org/)** - Production database (via Prisma Postgres)
-
-### Development & Quality
-
-- **[Jest](https://jestjs.io/)** - Testing framework
-- **[ESLint](https://eslint.org/)** - Code linting
-- **[Prettier](https://prettier.io/)** - Code formatting
-- **[GitHub Actions](https://github.com/features/actions)** - CI/CD automation
-- **[class-validator](https://github.com/typestack/class-validator)** - DTO validation
-
----
+- **Framework:** NestJS 11
+- **Language:** TypeScript
+- **ORM:** Prisma 7
+- **Database:** PostgreSQL (Neon)
+- **Authentication:** JWT + RBAC
+- **Image hosting:** Cloudinary
+- **Testing:** Jest
+- **Deploy:** Render
+- **CI/CD:** GitHub Actions + Husky pre-commit hooks
 
 ## ✨ Features
 
-### Implemented ✅
+- 🔐 **Authentication:** JWT with refresh tokens
+- 🛡️ **Authorization:** RBAC with 5 levels (SUPER_ADMIN, ADMIN, STAFF, USER, GUEST)
+- 👤 **GUEST system:** Sign-up-free checkout (phone-based identification)
+- 📦 **Catalog:** Products, customizable combos, ingredients, categories, types
+- 🖼️ **Image upload:** Cloudinary with on-the-fly transformations
+- 🔒 **Data integrity:** Referential integrity validation on soft-delete (HTTP 409)
+- 📚 **Documentation:** Technical docs versioned in `docs/`
 
-- **Products Management**
-  - Full CRUD operations
-  - Rich product data (title, image, price, order)
-  - Ingredient relationships
-  - Product type categorization
-- **Product Types System**
-  - Dynamic product categories (database-driven)
-  - Previously enum-based, migrated to relational table for flexibility
-- **Data Validation**
-  - Input validation with DTOs
-  - Type safety throughout the application
-- **Testing Infrastructure**
-  - Unit tests for all service methods
-  - Mocked dependencies for isolated testing
-  - 9 tests passing (100% service coverage)
-- **CI/CD Pipeline**
-  - Automated testing on push/PR
-  - Linting and build verification
-  - Quality gates enforced
-
-- **Authentication & Authorization**
-  - JWT authentication (register, login, profile)
-  - Role-based access control (SUPER_ADMIN, ADMIN, STAFF, USER, GUEST)
-  - Guest checkout system (phone-only, convert to USER)
-  - Protected admin routes (POST/PATCH/DELETE)
-  - See [README-AUTH.md](README-AUTH.md) for details
-- **GraphQL API**
-  - Full GraphQL layer alongside REST
-  - Code First approach with TypeScript
-  - Interactive playground at `/graphql` (disabled in production)
-  - Complete CRUD for Products and ProductTypes
-  - See [GraphQL Documentation](docs/GRAPHQL.md) for details
-- **Production Deployment**
-  - Dual environments: DEV + PRD (Render + Neon PostgreSQL)
-  - UptimeRobot keep-alive for zero cold-start
-  - Automated deploy via git push
-
-### In Progress 🚧
-
-- Image upload (Cloudinary/S3 integration)
-- Admin Panel (Angular - separate frontend)
-- Order management system
-
----
-
-## 🛠️ Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
-- Node.js 20.x or higher
-- npm or pnpm
-- PostgreSQL database (or use Prisma Postgres)
+- Node.js 20+
+- PostgreSQL (or use Neon free tier)
+- Cloudinary account (free tier)
 
 ### Installation
 
-1. **Clone the repository**
-
-   ```bash
-   git clone https://github.com/danieltquadros/ohana-api.git
-   cd ohana-api
-   ```
-
-2. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-3. **Configure environment variables**
-
-   ```bash
-   # Create .env file
-   cp .env.example .env
-
-   # Add your database connection string
-   DATABASE_URL="your-postgresql-connection-string"
-   ```
-
-4. **Generate Prisma Client**
-
-   ```bash
-   npx prisma generate
-   ```
-
-5. **Run database migrations**
-
-   ```bash
-   npx prisma migrate dev
-   ```
-
-6. **Seed the database** (optional)
-
-   ```bash
-   npx prisma db seed
-   ```
-
-7. **Start the development server**
-   ```bash
-   npm run start:dev
-   ```
-
-The API will be available at `http://localhost:3000`
-
-### GraphQL Playground
-
-Access the interactive GraphQL playground at:
-
-```
-http://localhost:3000/graphql
+```bash
+git clone https://github.com/danieltquadros/ohana-api.git
+cd ohana-api
+npm install
 ```
 
-For complete GraphQL documentation, see [docs/GRAPHQL.md](docs/GRAPHQL.md)
-
----
-
-## 🧪 Running Tests
+### Database setup
 
 ```bash
-# Run all tests
-npm test
-
-# Watch mode
-npm run test:watch
-
-# Test coverage
-npm run test:cov
-
-# E2E tests
-npm run test:e2e
+npx prisma migrate dev
+npx prisma db seed
 ```
 
-### Current Test Coverage
-
-- **Unit Tests:** 9 passing
-- **Coverage:** 100% of ProductsService methods
-- **Test Strategy:** Mock-based unit testing with Jest
-
----
-
-## 📚 API Documentation
-
-### Base URL
-
-```
-http://localhost:3000
-```
-
-### Endpoints
-
-#### Products
-
-| Method | Endpoint        | Description                      |
-| ------ | --------------- | -------------------------------- |
-| GET    | `/products`     | List all products with relations |
-| GET    | `/products/:id` | Get product by ID                |
-| POST   | `/products`     | Create new product               |
-| PATCH  | `/products/:id` | Update product                   |
-| DELETE | `/products/:id` | Delete product                   |
-
-#### Example: Create Product
+### Running locally
 
 ```bash
-POST /products
-Content-Type: application/json
-
-{
-  "title": "Combo Salmão",
-  "image": "combo-salmao.jpg",
-  "price": 45.00,
-  "order": 1,
-  "productTypeId": 1,
-  "ingredients": [
-    { "name": "Salmão", "quantity": 10 },
-    { "name": "Cream Cheese", "quantity": 2 }
-  ]
-}
+npm run start:dev
 ```
 
----
+API will be available at [http://localhost:3000](http://localhost:3000).
 
-## 📁 Project Structure
+## 🌐 Environment Variables
 
-```
-ohana-api/
-├── src/
-│   ├── prisma/           # Prisma service & module
-│   │   ├── prisma.service.ts
-│   │   └── prisma.module.ts
-│   ├── products/         # Products feature module
-│   │   ├── dto/          # Data Transfer Objects
-│   │   ├── entities/     # Domain entities
-│   │   ├── products.controller.ts
-│   │   ├── products.service.ts
-│   │   ├── products.module.ts
-│   │   └── *.spec.ts     # Unit tests
-│   ├── app.module.ts     # Root module
-│   └── main.ts           # Application entry point
-├── prisma/
-│   ├── schema.prisma     # Database schema
-│   ├── migrations/       # Migration history
-│   └── seed.ts           # Database seeding
-├── test/                 # E2E tests
-├── .github/
-│   └── workflows/
-│       └── ci.yml        # CI/CD pipeline
-├── DEVELOPMENT_GUIDELINES.md
-└── README.md
+Create a `.env` file in the project root:
+
+```env
+DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
+
+JWT_SECRET="your-secret-key"
+JWT_EXPIRES_IN="7d"
+
+PORT=3000
+
+CLOUDINARY_CLOUD_NAME="your_cloud_name"
+CLOUDINARY_API_KEY="your_api_key"
+CLOUDINARY_API_SECRET="your_api_secret"
 ```
 
----
+## 🧪 Testing
 
-## 📖 Development Guidelines
+```bash
+npm run test         # unit tests
+npm run test:watch   # watch mode
+npm run test:cov     # coverage report
+```
 
-This project follows strict development guidelines to ensure code quality, security, and maintainability. Key principles:
+Currently 65+ unit tests covering services and controllers.
 
-- **No `as any` casts** - Type safety is non-negotiable
-- **Test-driven development** - Code and tests evolve together
-- **Security first** - Environment variables, no hardcoded secrets
-- **Production-ready from day one** - All code considers deployment
+## 🏗️ Project Structure
 
-See [DEVELOPMENT_GUIDELINES.md](DEVELOPMENT_GUIDELINES.md) for the complete guide.
+```
+src/
+├── auth/            # JWT, guards, decorators, RBAC
+├── products/        # Product CRUD
+├── combos/          # Combo CRUD with product relations
+├── ingredients/     # Ingredient CRUD
+├── categories/      # Category CRUD
+├── product-types/   # Product type CRUD
+├── upload/          # Cloudinary integration
+├── prisma/          # Prisma service
+└── common/          # Shared enums and utilities
+prisma/
+├── schema.prisma    # Database schema
+└── migrations/      # Versioned migrations
+docs/                # Technical documentation
+```
 
----
+## 📜 Available Scripts
 
-## 🔮 Roadmap
+| Script | Description |
+|--------|-------------|
+| `npm run start:dev` | Start dev server with watch mode |
+| `npm run build` | Build production bundle |
+| `npm run start:prod` | Start production server |
+| `npm run test` | Run unit tests |
+| `npm run lint` | Run ESLint |
 
-### Completed ✅
+## ☁️ Deployment
 
-1. ~~E2E Tests~~ - 65 unit tests + E2E tests passing
-2. ~~GraphQL Layer~~ - Full GraphQL alongside REST
-3. ~~Authentication~~ - JWT + RBAC + Guest system
-4. ~~Deployment~~ - Render + Neon (DEV + PRD)
-5. ~~Environment Separation~~ - DEV/PRD with separate DBs
-
-### Next Steps (Priority Order)
-
-1. **Image Upload** - Cloud storage integration (Cloudinary/S3)
-2. **Admin Panel** - Angular-based admin interface
-3. **Order Management** - Shopping cart and order processing
-
-### Future Enhancements
-
-- Real-time updates with WebSockets
-- Multi-language support
-- Analytics dashboard
-- Integration with payment gateways
-
----
-
-## 🤝 Contributing
-
-This is a personal portfolio project, but feedback and suggestions are welcome! Feel free to:
-
-- Open issues for bugs or suggestions
-- Fork and experiment
-- Reach out with questions
-
----
+- **Production:** Render — auto-deploy on push to `main`
+- **Development:** Render — auto-deploy on push to `development`
+- **Database:** Neon PostgreSQL (DEV + PRD isolated)
+- **Monitoring:** UptimeRobot (scheduled via GitHub Actions for Free Tier optimization)
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-## 👤 Author
-
-**Daniel Quadros**
-
-- GitHub: [@danieltquadros](https://github.com/danieltquadros)
-- Project: [Ohana Sushi API](https://github.com/danieltquadros/ohana-api)
-
----
-
-<div align="center">
-  
-**⭐ If you find this project interesting, please consider giving it a star!**
-
-Made with ❤️ using NestJS, Prisma, and TypeScript
-
-</div>
-
-```bash
-$ npm install
-```
-
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
-
-## Run tests
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
-```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+MIT
