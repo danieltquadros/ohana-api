@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
@@ -53,6 +57,16 @@ export class IngredientsService {
 
   async remove(id: number): Promise<Ingredient> {
     await this.findOne(id);
+
+    const usageCount = await this.prisma.productIngredient.count({
+      where: { ingredientId: id },
+    });
+
+    if (usageCount > 0) {
+      throw new ConflictException(
+        `Não é possível excluir este ingrediente pois está sendo usado em ${usageCount} produto(s).`,
+      );
+    }
 
     return this.prisma.ingredient.delete({
       where: { id },

@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ProductsService } from './products.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { UploadService } from '../upload/upload.service';
-import { NotFoundException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 
 describe('ProductsService', () => {
   let service: ProductsService;
@@ -17,6 +17,9 @@ describe('ProductsService', () => {
     productIngredient: {
       deleteMany: jest.fn(),
       createMany: jest.fn(),
+    },
+    comboProduct: {
+      count: jest.fn(),
     },
     $transaction: jest.fn((callback: any) => callback(mockPrismaService)),
   };
@@ -320,36 +323,33 @@ describe('ProductsService', () => {
   });
 
   describe('remove', () => {
-    it('should soft delete a product', async () => {
+    it('should soft delete a product when not in active combo', async () => {
       const softDeletedProduct = { ...mockProduct, isActive: false };
       mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+      mockPrismaService.comboProduct.count.mockResolvedValue(0);
       mockPrismaService.product.update.mockResolvedValue(softDeletedProduct);
 
       const result = await service.remove(1);
 
       expect(result).toEqual(softDeletedProduct);
-      expect(mockPrismaService.product.findUnique).toHaveBeenCalledWith({
-        where: { id: 1 },
-        include: {
-          type: true,
-          category: true,
-          ingredients: {
-            include: {
-              ingredient: true,
-            },
-            orderBy: { order: 'asc' },
-          },
-          combos: {
-            include: {
-              combo: true,
-            },
-          },
+      expect(mockPrismaService.comboProduct.count).toHaveBeenCalledWith({
+        where: {
+          productId: 1,
+          combo: { isActive: true },
         },
       });
       expect(mockPrismaService.product.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: { isActive: false },
       });
+    });
+
+    it('should throw ConflictException when product is in active combo', async () => {
+      mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+      mockPrismaService.comboProduct.count.mockResolvedValue(2);
+
+      await expect(service.remove(1)).rejects.toThrow(ConflictException);
+      expect(mockPrismaService.product.update).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when removing non-existent product', async () => {
