@@ -52,25 +52,45 @@ export class CategoriesService {
   async remove(id: number): Promise<Category> {
     await this.findOne(id);
 
-    const [activeProducts, activeCombos] = await Promise.all([
-      this.prisma.product.count({
-        where: { categoryId: id, isActive: true },
-      }),
-      this.prisma.combo.count({
-        where: { categoryId: id, isActive: true },
-      }),
-    ]);
+    const [activeProducts, inactiveProducts, activeCombos, inactiveCombos] =
+      await Promise.all([
+        this.prisma.product.count({
+          where: { categoryId: id, isActive: true },
+        }),
+        this.prisma.product.count({
+          where: { categoryId: id, isActive: false },
+        }),
+        this.prisma.combo.count({
+          where: { categoryId: id, isActive: true },
+        }),
+        this.prisma.combo.count({
+          where: { categoryId: id, isActive: false },
+        }),
+      ]);
 
-    if (activeProducts > 0 || activeCombos > 0) {
+    const totalProducts = activeProducts + inactiveProducts;
+    const totalCombos = activeCombos + inactiveCombos;
+
+    if (totalProducts > 0 || totalCombos > 0) {
       const parts: string[] = [];
-      if (activeProducts > 0) {
-        parts.push(`${activeProducts} produto(s)`);
+      if (totalProducts > 0) {
+        const detail = `${totalProducts} produto(s)`;
+        parts.push(
+          inactiveProducts > 0
+            ? `${detail} (${activeProducts} ativo(s), ${inactiveProducts} inativo(s))`
+            : detail,
+        );
       }
-      if (activeCombos > 0) {
-        parts.push(`${activeCombos} combo(s)`);
+      if (totalCombos > 0) {
+        const detail = `${totalCombos} combo(s)`;
+        parts.push(
+          inactiveCombos > 0
+            ? `${detail} (${activeCombos} ativo(s), ${inactiveCombos} inativo(s))`
+            : detail,
+        );
       }
       throw new ConflictException(
-        `Não é possível excluir esta categoria pois está sendo usada em ${parts.join(' e ')} ativo(s).`,
+        `Não é possível excluir esta categoria pois está sendo usada em ${parts.join(' e ')}. Exclua-os primeiro.`,
       );
     }
 
