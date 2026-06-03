@@ -200,19 +200,25 @@ describe('CategoriesService', () => {
       });
     });
 
-    it('should throw ConflictException when category has active products', async () => {
+    it('should throw ConflictException when category has products (active or inactive)', async () => {
       mockPrismaService.category.findUnique.mockResolvedValue(mockCategory);
-      mockPrismaService.product.count.mockResolvedValue(3);
+      mockPrismaService.product.count.mockImplementation(
+        (args: { where: { isActive: boolean } }) =>
+          Promise.resolve(args.where.isActive ? 3 : 0),
+      );
       mockPrismaService.combo.count.mockResolvedValue(0);
 
       await expect(service.remove(1)).rejects.toThrow(ConflictException);
       expect(mockPrismaService.category.delete).not.toHaveBeenCalled();
     });
 
-    it('should throw ConflictException when category has active combos', async () => {
+    it('should throw ConflictException when category has combos (active or inactive)', async () => {
       mockPrismaService.category.findUnique.mockResolvedValue(mockCategory);
       mockPrismaService.product.count.mockResolvedValue(0);
-      mockPrismaService.combo.count.mockResolvedValue(2);
+      mockPrismaService.combo.count.mockImplementation(
+        (args: { where: { isActive: boolean } }) =>
+          Promise.resolve(args.where.isActive ? 0 : 2),
+      );
 
       await expect(service.remove(1)).rejects.toThrow(ConflictException);
       expect(mockPrismaService.category.delete).not.toHaveBeenCalled();
