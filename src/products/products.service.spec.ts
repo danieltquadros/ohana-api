@@ -13,6 +13,7 @@ describe('ProductsService', () => {
       findMany: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     },
     productIngredient: {
       deleteMany: jest.fn(),
@@ -323,24 +324,22 @@ describe('ProductsService', () => {
   });
 
   describe('remove', () => {
-    it('should soft delete a product when not in active combo', async () => {
-      const softDeletedProduct = { ...mockProduct, isActive: false };
+    it('should hard delete a product when not in active combo', async () => {
       mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
       mockPrismaService.comboProduct.count.mockResolvedValue(0);
-      mockPrismaService.product.update.mockResolvedValue(softDeletedProduct);
+      mockPrismaService.product.delete.mockResolvedValue(mockProduct);
 
       const result = await service.remove(1);
 
-      expect(result).toEqual(softDeletedProduct);
+      expect(result).toEqual(mockProduct);
       expect(mockPrismaService.comboProduct.count).toHaveBeenCalledWith({
         where: {
           productId: 1,
           combo: { isActive: true },
         },
       });
-      expect(mockPrismaService.product.update).toHaveBeenCalledWith({
+      expect(mockPrismaService.product.delete).toHaveBeenCalledWith({
         where: { id: 1 },
-        data: { isActive: false },
       });
     });
 
@@ -349,14 +348,14 @@ describe('ProductsService', () => {
       mockPrismaService.comboProduct.count.mockResolvedValue(2);
 
       await expect(service.remove(1)).rejects.toThrow(ConflictException);
-      expect(mockPrismaService.product.update).not.toHaveBeenCalled();
+      expect(mockPrismaService.product.delete).not.toHaveBeenCalled();
     });
 
     it('should throw NotFoundException when removing non-existent product', async () => {
       mockPrismaService.product.findUnique.mockResolvedValue(null);
 
       await expect(service.remove(999)).rejects.toThrow(NotFoundException);
-      expect(mockPrismaService.product.update).not.toHaveBeenCalled();
+      expect(mockPrismaService.product.delete).not.toHaveBeenCalled();
     });
   });
 });

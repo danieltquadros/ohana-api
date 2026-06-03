@@ -45,9 +45,9 @@ export class ProductsService {
     });
   }
 
-  async findAll(): Promise<Product[]> {
+  async findAll(includeInactive = false): Promise<Product[]> {
     return this.prisma.product.findMany({
-      where: { isActive: true },
+      where: includeInactive ? undefined : { isActive: true },
       include: {
         type: true,
         category: true,
@@ -172,9 +172,8 @@ export class ProductsService {
       }
     }
 
-    return this.prisma.product.update({
+    return this.prisma.product.delete({
       where: { id },
-      data: { isActive: false },
     });
   }
 

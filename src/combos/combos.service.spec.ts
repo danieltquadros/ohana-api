@@ -12,6 +12,7 @@ describe('CombosService', () => {
       findMany: jest.fn(),
       findUnique: jest.fn(),
       update: jest.fn(),
+      delete: jest.fn(),
     },
     comboProduct: {
       deleteMany: jest.fn(),
@@ -303,29 +304,15 @@ describe('CombosService', () => {
   });
 
   describe('remove', () => {
-    it('should soft delete a combo', async () => {
-      const softDeletedCombo = { ...mockCombo, isActive: false };
+    it('should hard delete a combo', async () => {
       mockPrismaService.combo.findUnique.mockResolvedValue(mockCombo);
-      mockPrismaService.combo.update.mockResolvedValue(softDeletedCombo);
+      mockPrismaService.combo.delete.mockResolvedValue(mockCombo);
 
       const result = await service.remove(1);
 
-      expect(result).toEqual(softDeletedCombo);
-      expect(mockPrismaService.combo.findUnique).toHaveBeenCalledWith({
+      expect(result).toEqual(mockCombo);
+      expect(mockPrismaService.combo.delete).toHaveBeenCalledWith({
         where: { id: 1 },
-        include: {
-          category: true,
-          products: {
-            include: {
-              product: true,
-            },
-            orderBy: { order: 'asc' },
-          },
-        },
-      });
-      expect(mockPrismaService.combo.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: { isActive: false },
       });
     });
 
@@ -333,7 +320,7 @@ describe('CombosService', () => {
       mockPrismaService.combo.findUnique.mockResolvedValue(null);
 
       await expect(service.remove(999)).rejects.toThrow(NotFoundException);
-      expect(mockPrismaService.combo.update).not.toHaveBeenCalled();
+      expect(mockPrismaService.combo.delete).not.toHaveBeenCalled();
     });
   });
 });
