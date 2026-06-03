@@ -58,13 +58,16 @@ export class IngredientsService {
   async remove(id: number): Promise<Ingredient> {
     await this.findOne(id);
 
-    const usageCount = await this.prisma.productIngredient.count({
-      where: { ingredientId: id },
+    const activeUsageCount = await this.prisma.productIngredient.count({
+      where: {
+        ingredientId: id,
+        product: { isActive: true },
+      },
     });
 
-    if (usageCount > 0) {
+    if (activeUsageCount > 0) {
       throw new ConflictException(
-        `Não é possível excluir este ingrediente pois está sendo usado em ${usageCount} produto(s).`,
+        `Não é possível excluir este ingrediente pois está sendo usado em ${activeUsageCount} produto(s) ativo(s).`,
       );
     }
 
