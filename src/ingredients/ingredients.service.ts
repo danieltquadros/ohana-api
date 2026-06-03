@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
@@ -8,9 +12,7 @@ import { Ingredient } from '@prisma/client';
 export class IngredientsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
-    createIngredientDto: CreateIngredientDto,
-  ): Promise<Ingredient> {
+  async create(createIngredientDto: CreateIngredientDto): Promise<Ingredient> {
     return this.prisma.ingredient.create({
       data: createIngredientDto,
     });
@@ -55,6 +57,19 @@ export class IngredientsService {
 
   async remove(id: number): Promise<Ingredient> {
     await this.findOne(id);
+
+    const activeUsageCount = await this.prisma.productIngredient.count({
+      where: {
+        ingredientId: id,
+        product: { isActive: true },
+      },
+    });
+
+    if (activeUsageCount > 0) {
+      throw new ConflictException(
+        `Não é possível excluir este ingrediente pois está sendo usado em ${activeUsageCount} produto(s) ativo(s).`,
+      );
+    }
 
     return this.prisma.ingredient.delete({
       where: { id },

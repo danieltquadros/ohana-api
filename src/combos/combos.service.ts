@@ -37,9 +37,9 @@ export class CombosService {
     });
   }
 
-  async findAll(): Promise<Combo[]> {
+  async findAll(includeInactive = false): Promise<Combo[]> {
     return this.prisma.combo.findMany({
-      where: { isActive: true },
+      where: includeInactive ? undefined : { isActive: true },
       orderBy: { order: 'asc' },
       include: {
         category: true,
@@ -72,10 +72,7 @@ export class CombosService {
     return combo;
   }
 
-  async update(
-    id: number,
-    updateComboDto: UpdateComboDto,
-  ): Promise<Combo> {
+  async update(id: number, updateComboDto: UpdateComboDto): Promise<Combo> {
     await this.findOne(id);
 
     const { products, ...comboData } = updateComboDto;
@@ -114,9 +111,8 @@ export class CombosService {
   async remove(id: number): Promise<Combo> {
     await this.findOne(id);
 
-    return this.prisma.combo.update({
+    return this.prisma.combo.delete({
       where: { id },
-      data: { isActive: false },
     });
   }
 

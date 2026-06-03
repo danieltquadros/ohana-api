@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProductTypeDto } from './dto/create-product-type.dto';
 import { UpdateProductTypeDto } from './dto/update-product-type.dto';
 import { PrismaService } from '../prisma/prisma.service';
@@ -31,6 +35,22 @@ export class ProductTypesService {
   }
 
   async remove(id: number) {
+    const productType = await this.findOne(id);
+
+    if (!productType) {
+      throw new NotFoundException(`Product type with ID ${id} not found`);
+    }
+
+    const usageCount = await this.prisma.product.count({
+      where: { productTypeId: id, isActive: true },
+    });
+
+    if (usageCount > 0) {
+      throw new ConflictException(
+        `Não é possível excluir este tipo de produto pois está sendo usado em ${usageCount} produto(s) ativo(s).`,
+      );
+    }
+
     return this.prisma.productType.delete({
       where: { id },
     });

@@ -32,6 +32,7 @@ export class ProductsController {
   findAll(
     @Query('typeId') typeId?: string,
     @Query('categoryId') categoryId?: string,
+    @Query('includeInactive') includeInactive?: string,
   ) {
     if (typeId) {
       return this.productsService.findByType(parseInt(typeId, 10));
@@ -41,7 +42,7 @@ export class ProductsController {
       return this.productsService.findByCategory(parseInt(categoryId, 10));
     }
 
-    return this.productsService.findAll();
+    return this.productsService.findAll(includeInactive === 'true');
   }
 
   @Get(':id')

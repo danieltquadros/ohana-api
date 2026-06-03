@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -14,9 +18,9 @@ export class CategoriesService {
     });
   }
 
-  async findAll(): Promise<Category[]> {
+  async findAll(includeInactive = false): Promise<Category[]> {
     return this.prisma.category.findMany({
-      where: { isActive: true },
+      where: includeInactive ? undefined : { isActive: true },
       orderBy: { order: 'asc' },
     });
   }
@@ -48,9 +52,30 @@ export class CategoriesService {
   async remove(id: number): Promise<Category> {
     await this.findOne(id);
 
-    return this.prisma.category.update({
+    const [activeProducts, activeCombos] = await Promise.all([
+      this.prisma.product.count({
+        where: { categoryId: id, isActive: true },
+      }),
+      this.prisma.combo.count({
+        where: { categoryId: id, isActive: true },
+      }),
+    ]);
+
+    if (activeProducts > 0 || activeCombos > 0) {
+      const parts: string[] = [];
+      if (activeProducts > 0) {
+        parts.push(`${activeProducts} produto(s)`);
+      }
+      if (activeCombos > 0) {
+        parts.push(`${activeCombos} combo(s)`);
+      }
+      throw new ConflictException(
+        `Não é possível excluir esta categoria pois está sendo usada em ${parts.join(' e ')} ativo(s).`,
+      );
+    }
+
+    return this.prisma.category.delete({
       where: { id },
-      data: { isActive: false },
     });
   }
 }
