@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CombosService } from './combos.service';
@@ -28,8 +29,8 @@ export class CombosController {
   }
 
   @Get()
-  findAll() {
-    return this.combosService.findAll();
+  findAll(@Query('includeInactive') includeInactive?: string) {
+    return this.combosService.findAll(includeInactive === 'true');
   }
 
   @Get('active')

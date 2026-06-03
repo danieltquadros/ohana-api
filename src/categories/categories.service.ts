@@ -18,9 +18,9 @@ export class CategoriesService {
     });
   }
 
-  async findAll(): Promise<Category[]> {
+  async findAll(includeInactive = false): Promise<Category[]> {
     return this.prisma.category.findMany({
-      where: { isActive: true },
+      where: includeInactive ? undefined : { isActive: true },
       orderBy: { order: 'asc' },
     });
   }
@@ -74,9 +74,8 @@ export class CategoriesService {
       );
     }
 
-    return this.prisma.category.update({
+    return this.prisma.category.delete({
       where: { id },
-      data: { isActive: false },
     });
   }
 }
