@@ -45,7 +45,10 @@ export class ProductsService {
     });
   }
 
-  async findAll(includeInactive = false, available = false): Promise<Product[]> {
+  async findAll(
+    includeInactive = false,
+    available = false,
+  ): Promise<Product[]> {
     const where = available
       ? { isActive: true, price: { gt: 0 } }
       : includeInactive

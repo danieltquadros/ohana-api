@@ -9,9 +9,6 @@ import { CategoryType } from '../../common/enums/category-type.enum';
 
 export class CreateCategoryDto {
   @IsString()
-  name!: string;
-
-  @IsString()
   label!: string;
 
   @IsString()

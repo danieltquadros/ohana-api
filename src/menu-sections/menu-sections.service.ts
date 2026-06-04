@@ -88,14 +88,13 @@ export class MenuSectionsService {
 
     const nextKind = dto.kind ?? existing.kind;
     const nextProductTypeId =
-      dto.productTypeId !== undefined ? dto.productTypeId : existing.productTypeId;
+      dto.productTypeId !== undefined
+        ? dto.productTypeId
+        : existing.productTypeId;
 
     this.validateKindAndProductType(nextKind, nextProductTypeId ?? undefined);
 
-    if (
-      nextProductTypeId &&
-      nextProductTypeId !== existing.productTypeId
-    ) {
+    if (nextProductTypeId && nextProductTypeId !== existing.productTypeId) {
       await this.assertProductTypeExists(nextProductTypeId);
       await this.assertProductTypeNotInUse(nextProductTypeId);
     }
@@ -152,7 +151,9 @@ export class MenuSectionsService {
     }
   }
 
-  private async assertProductTypeNotInUse(productTypeId: number): Promise<void> {
+  private async assertProductTypeNotInUse(
+    productTypeId: number,
+  ): Promise<void> {
     const existing = await this.prisma.menuSection.findUnique({
       where: { productTypeId },
     });
