@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { IngredientsService } from './ingredients.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { ConflictException, NotFoundException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 
 describe('IngredientsService', () => {
   let service: IngredientsService;
@@ -223,7 +223,7 @@ describe('IngredientsService', () => {
   });
 
   describe('remove', () => {
-    it('should delete an ingredient when not in use by active products', async () => {
+    it('should delete an ingredient when not used by any product', async () => {
       mockPrismaService.ingredient.findUnique.mockResolvedValue(mockIngredient);
       mockPrismaService.productIngredient.count.mockResolvedValue(0);
       mockPrismaService.ingredient.delete.mockResolvedValue(mockIngredient);
@@ -231,12 +231,6 @@ describe('IngredientsService', () => {
       const result = await service.remove(1);
 
       expect(result).toEqual(mockIngredient);
-      expect(mockPrismaService.productIngredient.count).toHaveBeenCalledWith({
-        where: {
-          ingredientId: 1,
-          product: { isActive: true },
-        },
-      });
       expect(mockPrismaService.ingredient.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       });
@@ -244,11 +238,26 @@ describe('IngredientsService', () => {
 
     it('should throw ConflictException when ingredient is in use by active products', async () => {
       mockPrismaService.ingredient.findUnique.mockResolvedValue(mockIngredient);
-      mockPrismaService.productIngredient.count.mockResolvedValue(3);
+      mockPrismaService.productIngredient.count.mockImplementation(
+        (args: { where: { product: { isActive: boolean } } }) =>
+          Promise.resolve(args.where.product.isActive ? 3 : 0),
+      );
 
-      await expect(service.remove(1)).rejects.toThrow(ConflictException);
       await expect(service.remove(1)).rejects.toThrow(
-        'Não é possível excluir este ingrediente pois está sendo usado em 3 produto(s) ativo(s).',
+        /3 ativo\(s\) produto\(s\)/,
+      );
+      expect(mockPrismaService.ingredient.delete).not.toHaveBeenCalled();
+    });
+
+    it('should throw ConflictException when ingredient is in use by inactive products', async () => {
+      mockPrismaService.ingredient.findUnique.mockResolvedValue(mockIngredient);
+      mockPrismaService.productIngredient.count.mockImplementation(
+        (args: { where: { product: { isActive: boolean } } }) =>
+          Promise.resolve(args.where.product.isActive ? 0 : 2),
+      );
+
+      await expect(service.remove(1)).rejects.toThrow(
+        /2 inativo\(s\) produto\(s\)/,
       );
       expect(mockPrismaService.ingredient.delete).not.toHaveBeenCalled();
     });

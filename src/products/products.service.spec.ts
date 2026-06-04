@@ -324,7 +324,7 @@ describe('ProductsService', () => {
   });
 
   describe('remove', () => {
-    it('should hard delete a product when not in active combo', async () => {
+    it('should hard delete a product when not used by any combo', async () => {
       mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
       mockPrismaService.comboProduct.count.mockResolvedValue(0);
       mockPrismaService.product.delete.mockResolvedValue(mockProduct);
@@ -332,12 +332,6 @@ describe('ProductsService', () => {
       const result = await service.remove(1);
 
       expect(result).toEqual(mockProduct);
-      expect(mockPrismaService.comboProduct.count).toHaveBeenCalledWith({
-        where: {
-          productId: 1,
-          combo: { isActive: true },
-        },
-      });
       expect(mockPrismaService.product.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       });
@@ -345,7 +339,21 @@ describe('ProductsService', () => {
 
     it('should throw ConflictException when product is in active combo', async () => {
       mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
-      mockPrismaService.comboProduct.count.mockResolvedValue(2);
+      mockPrismaService.comboProduct.count.mockImplementation(
+        (args: { where: { combo: { isActive: boolean } } }) =>
+          Promise.resolve(args.where.combo.isActive ? 2 : 0),
+      );
+
+      await expect(service.remove(1)).rejects.toThrow(ConflictException);
+      expect(mockPrismaService.product.delete).not.toHaveBeenCalled();
+    });
+
+    it('should throw ConflictException when product is in inactive combo', async () => {
+      mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+      mockPrismaService.comboProduct.count.mockImplementation(
+        (args: { where: { combo: { isActive: boolean } } }) =>
+          Promise.resolve(args.where.combo.isActive ? 0 : 1),
+      );
 
       await expect(service.remove(1)).rejects.toThrow(ConflictException);
       expect(mockPrismaService.product.delete).not.toHaveBeenCalled();

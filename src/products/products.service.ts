@@ -151,16 +151,21 @@ export class ProductsService {
   async remove(id: number): Promise<Product> {
     const product = await this.findOne(id);
 
-    const activeComboUsage = await this.prisma.comboProduct.count({
-      where: {
-        productId: id,
-        combo: { isActive: true },
-      },
-    });
+    const [activeCount, inactiveCount] = await Promise.all([
+      this.prisma.comboProduct.count({
+        where: { productId: id, combo: { isActive: true } },
+      }),
+      this.prisma.comboProduct.count({
+        where: { productId: id, combo: { isActive: false } },
+      }),
+    ]);
 
-    if (activeComboUsage > 0) {
+    if (activeCount > 0 || inactiveCount > 0) {
+      const parts: string[] = [];
+      if (activeCount > 0) parts.push(`${activeCount} ativo(s)`);
+      if (inactiveCount > 0) parts.push(`${inactiveCount} inativo(s)`);
       throw new ConflictException(
-        `Não é possível excluir este produto pois está sendo usado em ${activeComboUsage} combo(s) ativo(s).`,
+        `Não é possível excluir este produto pois está sendo usado em ${parts.join(' e ')} combo(s). Exclua os combos primeiro.`,
       );
     }
 
