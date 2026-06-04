@@ -89,8 +89,7 @@ async function main() {
     const type = await prisma.productType.create({
       data: {
         name: uniqueTypes[i],
-        order: i + 1,
-        inUse: true,
+        label: uniqueTypes[i],
       },
     });
     typeMap[uniqueTypes[i]] = type.id;
@@ -102,6 +101,7 @@ async function main() {
   const catPremium = await prisma.category.create({
     data: {
       name: 'Premium',
+      label: 'Premium',
       description: 'Produtos especiais',
       type: CategoryType.PRODUCT,
       order: 1,
@@ -112,6 +112,7 @@ async function main() {
   const catTradicional = await prisma.category.create({
     data: {
       name: 'Tradicional',
+      label: 'Tradicional',
       description: 'Clássicos',
       type: CategoryType.PRODUCT,
       order: 2,

@@ -34,17 +34,18 @@ const prisma = new PrismaClient({ adapter });
 // ============================================================
 
 const PRODUCT_TYPES = [
-  { name: 'COMBO', order: 1, inUse: true },
-  { name: 'TEMAKI', order: 2, inUse: true },
-  { name: 'MEGA_HOT', order: 3, inUse: true },
-  { name: 'POKES', order: 4, inUse: true },
-  { name: 'PORTION', order: 5, inUse: true },
-  { name: 'YAKISOBA', order: 6, inUse: true },
+  { name: 'COMBO', label: 'COMBO' },
+  { name: 'TEMAKI', label: 'TEMAKI' },
+  { name: 'MEGA_HOT', label: 'MEGA_HOT' },
+  { name: 'POKES', label: 'POKES' },
+  { name: 'PORTION', label: 'PORTION' },
+  { name: 'YAKISOBA', label: 'YAKISOBA' },
 ];
 
 const CATEGORIES = [
   {
     name: 'Premium',
+    label: 'Premium',
     description: 'Produtos especiais',
     type: 'PRODUCT' as const,
     order: 1,
@@ -52,6 +53,7 @@ const CATEGORIES = [
   },
   {
     name: 'Tradicional',
+    label: 'Tradicional',
     description: 'Clássicos',
     type: 'PRODUCT' as const,
     order: 2,

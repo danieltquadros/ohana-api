@@ -9,17 +9,20 @@ import { CategoryType } from '../../common/enums/category-type.enum';
 
 export class CreateCategoryDto {
   @IsString()
-  name: string;
+  name!: string;
+
+  @IsString()
+  label!: string;
 
   @IsString()
   @IsOptional()
   description?: string;
 
   @IsEnum(CategoryType)
-  type: CategoryType;
+  type!: CategoryType;
 
   @IsInt()
-  order: number;
+  order!: number;
 
   @IsBoolean()
   @IsOptional()
