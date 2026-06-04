@@ -9,6 +9,7 @@ import { IngredientsModule } from './ingredients/ingredients.module';
 import { CombosModule } from './combos/combos.module';
 import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
+import { MenuSectionsModule } from './menu-sections/menu-sections.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { UploadModule } from './upload/upload.module';
     IngredientsModule,
     CombosModule,
     UploadModule,
+    MenuSectionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

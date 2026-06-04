@@ -14,6 +14,7 @@ enum CategoryType {
 model Category {
   id          Int          @id @default(autoincrement())
   name        String       @unique
+  label       String
   description String?
   type        CategoryType
   order       Int
@@ -100,13 +101,35 @@ model Product {
 }
 
 model ProductType {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  order    Int
-  inUse    Boolean   @default(false)
-  products Product[]
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  label       String
+  isActive    Boolean      @default(true)
+  products    Product[]
+  menuSection MenuSection?
 
   @@map("product_types")
+}
+
+enum MenuSectionKind {
+  PRODUCT_TYPE
+  COMBOS
+}
+
+model MenuSection {
+  id            Int             @id @default(autoincrement())
+  label         String
+  order         Int
+  isActive      Boolean         @default(true)
+  kind          MenuSectionKind
+  productTypeId Int?            @unique
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  createdBy     Int?
+  updatedBy     Int?
+  productType   ProductType?    @relation(fields: [productTypeId], references: [id], onDelete: Restrict)
+
+  @@map("menu_sections")
 }
 
 model Ingredient {

@@ -1,13 +1,10 @@
-import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
 export class CreateProductTypeDto {
   @IsString()
-  name: string;
-
-  @IsInt()
-  order: number; // Obrigatório
+  label!: string;
 
   @IsBoolean()
-  @IsOptional() // Opcional porque tem default no banco
-  inUse?: boolean;
+  @IsOptional()
+  isActive?: boolean;
 }

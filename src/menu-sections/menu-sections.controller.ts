@@ -1,52 +1,47 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
+  Get,
+  Param,
   ParseIntPipe,
+  Patch,
+  Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { CombosService } from './combos.service';
-import { CreateComboDto } from './dto/create-combo.dto';
-import { UpdateComboDto } from './dto/update-combo.dto';
+import { MenuSectionsService } from './menu-sections.service';
+import { CreateMenuSectionDto } from './dto/create-menu-section.dto';
+import { UpdateMenuSectionDto } from './dto/update-menu-section.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 
-@Controller('combos')
-export class CombosController {
-  constructor(private readonly combosService: CombosService) {}
+@Controller('menu-sections')
+export class MenuSectionsController {
+  constructor(private readonly menuSectionsService: MenuSectionsService) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN', 'ADMIN')
   @Post()
-  create(@Body() createComboDto: CreateComboDto) {
-    return this.combosService.create(createComboDto);
+  create(@Body() dto: CreateMenuSectionDto) {
+    return this.menuSectionsService.create(dto);
   }
 
   @Get()
   findAll(
     @Query('includeInactive') includeInactive?: string,
-    @Query('available') available?: string,
+    @Query('withContent') withContent?: string,
   ) {
-    return this.combosService.findAll(
+    return this.menuSectionsService.findAll(
       includeInactive === 'true',
-      available === 'true',
+      withContent === 'true',
     );
-  }
-
-  @Get('active')
-  findActive() {
-    return this.combosService.findActive();
   }
 
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.combosService.findOne(id);
+    return this.menuSectionsService.findOne(id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -54,15 +49,15 @@ export class CombosController {
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateComboDto: UpdateComboDto,
+    @Body() dto: UpdateMenuSectionDto,
   ) {
-    return this.combosService.update(id, updateComboDto);
+    return this.menuSectionsService.update(id, dto);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('SUPER_ADMIN')
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {
-    return this.combosService.remove(id);
+    return this.menuSectionsService.remove(id);
   }
 }

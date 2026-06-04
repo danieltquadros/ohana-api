@@ -33,16 +33,28 @@ export class ProductsController {
     @Query('typeId') typeId?: string,
     @Query('categoryId') categoryId?: string,
     @Query('includeInactive') includeInactive?: string,
+    @Query('available') available?: string,
   ) {
+    const onlyAvailable = available === 'true';
+
     if (typeId) {
-      return this.productsService.findByType(parseInt(typeId, 10));
+      return this.productsService.findByType(
+        parseInt(typeId, 10),
+        onlyAvailable,
+      );
     }
 
     if (categoryId) {
-      return this.productsService.findByCategory(parseInt(categoryId, 10));
+      return this.productsService.findByCategory(
+        parseInt(categoryId, 10),
+        onlyAvailable,
+      );
     }
 
-    return this.productsService.findAll(includeInactive === 'true');
+    return this.productsService.findAll(
+      includeInactive === 'true',
+      onlyAvailable,
+    );
   }
 
   @Get(':id')
