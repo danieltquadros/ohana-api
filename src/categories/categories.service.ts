@@ -7,14 +7,26 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from '@prisma/client';
+import { toSlug } from '../common/utils/slug.util';
 
 @Injectable()
 export class CategoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
+    const name = toSlug(createCategoryDto.label);
+
+    const existing = await this.prisma.category.findUnique({
+      where: { name },
+    });
+    if (existing) {
+      throw new ConflictException(
+        `Já existe uma categoria com nome técnico "${name}" (gerado a partir do label "${createCategoryDto.label}").`,
+      );
+    }
+
     return this.prisma.category.create({
-      data: createCategoryDto,
+      data: { ...createCategoryDto, name },
     });
   }
 

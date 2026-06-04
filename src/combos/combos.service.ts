@@ -37,9 +37,15 @@ export class CombosService {
     });
   }
 
-  async findAll(includeInactive = false): Promise<Combo[]> {
+  async findAll(includeInactive = false, available = false): Promise<Combo[]> {
+    const where = available
+      ? { isActive: true, price: { gt: 0 } }
+      : includeInactive
+        ? undefined
+        : { isActive: true };
+
     return this.prisma.combo.findMany({
-      where: includeInactive ? undefined : { isActive: true },
+      where,
       orderBy: { order: 'asc' },
       include: {
         category: true,

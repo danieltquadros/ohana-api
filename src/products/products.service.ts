@@ -45,9 +45,18 @@ export class ProductsService {
     });
   }
 
-  async findAll(includeInactive = false): Promise<Product[]> {
+  async findAll(
+    includeInactive = false,
+    available = false,
+  ): Promise<Product[]> {
+    const where = available
+      ? { isActive: true, price: { gt: 0 } }
+      : includeInactive
+        ? undefined
+        : { isActive: true };
+
     return this.prisma.product.findMany({
-      where: includeInactive ? undefined : { isActive: true },
+      where,
       include: {
         type: true,
         category: true,
@@ -182,29 +191,45 @@ export class ProductsService {
     });
   }
 
-  async findByType(productTypeId: number): Promise<Product[]> {
+  async findByType(
+    productTypeId: number,
+    available = false,
+  ): Promise<Product[]> {
     return this.prisma.product.findMany({
       where: {
         productTypeId,
         isActive: true,
+        ...(available ? { price: { gt: 0 } } : {}),
       },
       include: {
         type: true,
         category: true,
+        ingredients: {
+          include: { ingredient: true },
+          orderBy: { order: 'asc' },
+        },
       },
       orderBy: { order: 'asc' },
     });
   }
 
-  async findByCategory(categoryId: number): Promise<Product[]> {
+  async findByCategory(
+    categoryId: number,
+    available = false,
+  ): Promise<Product[]> {
     return this.prisma.product.findMany({
       where: {
         categoryId,
         isActive: true,
+        ...(available ? { price: { gt: 0 } } : {}),
       },
       include: {
         type: true,
         category: true,
+        ingredients: {
+          include: { ingredient: true },
+          orderBy: { order: 'asc' },
+        },
       },
       orderBy: { order: 'asc' },
     });

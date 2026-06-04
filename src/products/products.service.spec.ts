@@ -172,6 +172,10 @@ describe('ProductsService', () => {
         include: {
           type: true,
           category: true,
+          ingredients: {
+            include: { ingredient: true },
+            orderBy: { order: 'asc' },
+          },
         },
         orderBy: { order: 'asc' },
       });
@@ -202,6 +206,10 @@ describe('ProductsService', () => {
         include: {
           type: true,
           category: true,
+          ingredients: {
+            include: { ingredient: true },
+            orderBy: { order: 'asc' },
+          },
         },
         orderBy: { order: 'asc' },
       });
