@@ -24,6 +24,9 @@ describe('ProductTypesService', () => {
             product: {
               count: jest.fn(),
             },
+            menuSection: {
+              findUnique: jest.fn(),
+            },
           },
         },
       ],
@@ -93,24 +96,36 @@ describe('ProductTypesService', () => {
   });
 
   describe('create', () => {
-    it('should create and return a new product type', async () => {
-      // Arrange
-      const createDto = { name: 'Novos Produtos', order: 3 };
-      const mockCreatedType = { id: 3, name: 'Novos Produtos', order: 3 };
+    it('should create and return a new product type generating name from label', async () => {
+      const createDto = { label: 'Porção' };
+      const mockCreatedType = { id: 3, name: 'PORCAO', label: 'Porção' };
 
+      jest
+        .spyOn(prisma.productType, 'findUnique')
+        .mockResolvedValue(null);
       jest
         .spyOn(prisma.productType, 'create')
         .mockResolvedValue(mockCreatedType as any);
 
-      // Act
       const result = await service.create(createDto);
 
-      // Assert
       expect(result).toEqual(mockCreatedType);
-      expect(prisma.productType.create).toHaveBeenCalledTimes(1);
       expect(prisma.productType.create).toHaveBeenCalledWith({
-        data: createDto,
+        data: { ...createDto, name: 'PORCAO' },
       });
+    });
+
+    it('should throw ConflictException when product type name already exists', async () => {
+      const createDto = { label: 'Porção' };
+
+      jest
+        .spyOn(prisma.productType, 'findUnique')
+        .mockResolvedValue({ id: 1, name: 'PORCAO', label: 'Porção' } as any);
+
+      await expect(service.create(createDto)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(prisma.productType.create).not.toHaveBeenCalled();
     });
   });
 
@@ -139,12 +154,13 @@ describe('ProductTypesService', () => {
 
   describe('remove', () => {
     it('should delete the product type when not in use', async () => {
-      const mockType = { id: 1, name: 'Combos', order: 1 };
+      const mockType = { id: 1, name: 'COMBO', label: 'Combos' };
 
       jest
         .spyOn(prisma.productType, 'findUnique')
         .mockResolvedValue(mockType as any);
       jest.spyOn(prisma.product, 'count').mockResolvedValue(0);
+      jest.spyOn(prisma.menuSection, 'findUnique').mockResolvedValue(null);
       jest
         .spyOn(prisma.productType, 'delete')
         .mockResolvedValue(mockType as any);
@@ -152,21 +168,43 @@ describe('ProductTypesService', () => {
       const result = await service.remove(1);
 
       expect(result).toEqual(mockType);
-      expect(prisma.product.count).toHaveBeenCalledWith({
-        where: { productTypeId: 1, isActive: true },
-      });
       expect(prisma.productType.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       });
     });
 
-    it('should throw ConflictException when product type is in use', async () => {
-      const mockType = { id: 1, name: 'Combos', order: 1 };
+    it('should throw ConflictException when product type has products (active or inactive)', async () => {
+      const mockType = { id: 1, name: 'COMBO', label: 'Combos' };
 
       jest
         .spyOn(prisma.productType, 'findUnique')
         .mockResolvedValue(mockType as any);
-      jest.spyOn(prisma.product, 'count').mockResolvedValue(5);
+      jest
+        .spyOn(prisma.product, 'count')
+        .mockImplementation((args: any) =>
+          Promise.resolve(args.where.isActive ? 5 : 0),
+        );
+      jest.spyOn(prisma.menuSection, 'findUnique').mockResolvedValue(null);
+
+      await expect(service.remove(1)).rejects.toThrow(ConflictException);
+      expect(prisma.productType.delete).not.toHaveBeenCalled();
+    });
+
+    it('should throw ConflictException when product type is bound to a menu section', async () => {
+      const mockType = { id: 1, name: 'COMBO', label: 'Combos' };
+      const mockMenuSection = {
+        id: 10,
+        label: 'Combos',
+        productTypeId: 1,
+      };
+
+      jest
+        .spyOn(prisma.productType, 'findUnique')
+        .mockResolvedValue(mockType as any);
+      jest.spyOn(prisma.product, 'count').mockResolvedValue(0);
+      jest
+        .spyOn(prisma.menuSection, 'findUnique')
+        .mockResolvedValue(mockMenuSection as any);
 
       await expect(service.remove(1)).rejects.toThrow(ConflictException);
       expect(prisma.productType.delete).not.toHaveBeenCalled();

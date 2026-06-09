@@ -57,43 +57,58 @@ describe('CategoriesService', () => {
   });
 
   describe('create', () => {
-    it('should create a new category', async () => {
+    it('should create a new category generating name from label', async () => {
       const createDto = {
-        name: 'Premium',
+        label: 'Premium',
         type: CategoryType.PRODUCT,
         order: 1,
       };
 
+      mockPrismaService.category.findUnique.mockResolvedValue(null);
       mockPrismaService.category.create.mockResolvedValue(mockCategory);
 
       const result = await service.create(createDto);
 
       expect(result).toEqual(mockCategory);
       expect(mockPrismaService.category.create).toHaveBeenCalledWith({
-        data: createDto,
+        data: { ...createDto, name: 'PREMIUM' },
       });
-      expect(mockPrismaService.category.create).toHaveBeenCalledTimes(1);
     });
 
-    it('should create a category with optional fields', async () => {
+    it('should generate slug correctly for labels with accents and spaces', async () => {
       const createDto = {
-        name: 'Especial',
-        type: CategoryType.COMBO,
-        order: 2,
-        createdBy: 1,
+        label: 'Açaí e Sobremesas',
+        type: CategoryType.PRODUCT,
+        order: 5,
       };
 
-      const categoryWithCreatedBy = { ...mockCategory, ...createDto };
-      mockPrismaService.category.create.mockResolvedValue(
-        categoryWithCreatedBy,
-      );
-
-      const result = await service.create(createDto);
-
-      expect(result).toEqual(categoryWithCreatedBy);
-      expect(mockPrismaService.category.create).toHaveBeenCalledWith({
-        data: createDto,
+      mockPrismaService.category.findUnique.mockResolvedValue(null);
+      mockPrismaService.category.create.mockResolvedValue({
+        ...mockCategory,
+        ...createDto,
+        name: 'ACAI_E_SOBREMESAS',
       });
+
+      await service.create(createDto);
+
+      expect(mockPrismaService.category.create).toHaveBeenCalledWith({
+        data: { ...createDto, name: 'ACAI_E_SOBREMESAS' },
+      });
+    });
+
+    it('should throw ConflictException when category name already exists', async () => {
+      const createDto = {
+        label: 'Premium',
+        type: CategoryType.PRODUCT,
+        order: 1,
+      };
+
+      mockPrismaService.category.findUnique.mockResolvedValue(mockCategory);
+
+      await expect(service.create(createDto)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(mockPrismaService.category.create).not.toHaveBeenCalled();
     });
   });
 
@@ -200,19 +215,25 @@ describe('CategoriesService', () => {
       });
     });
 
-    it('should throw ConflictException when category has active products', async () => {
+    it('should throw ConflictException when category has products (active or inactive)', async () => {
       mockPrismaService.category.findUnique.mockResolvedValue(mockCategory);
-      mockPrismaService.product.count.mockResolvedValue(3);
+      mockPrismaService.product.count.mockImplementation(
+        (args: { where: { isActive: boolean } }) =>
+          Promise.resolve(args.where.isActive ? 3 : 0),
+      );
       mockPrismaService.combo.count.mockResolvedValue(0);
 
       await expect(service.remove(1)).rejects.toThrow(ConflictException);
       expect(mockPrismaService.category.delete).not.toHaveBeenCalled();
     });
 
-    it('should throw ConflictException when category has active combos', async () => {
+    it('should throw ConflictException when category has combos (active or inactive)', async () => {
       mockPrismaService.category.findUnique.mockResolvedValue(mockCategory);
       mockPrismaService.product.count.mockResolvedValue(0);
-      mockPrismaService.combo.count.mockResolvedValue(2);
+      mockPrismaService.combo.count.mockImplementation(
+        (args: { where: { isActive: boolean } }) =>
+          Promise.resolve(args.where.isActive ? 0 : 2),
+      );
 
       await expect(service.remove(1)).rejects.toThrow(ConflictException);
       expect(mockPrismaService.category.delete).not.toHaveBeenCalled();
