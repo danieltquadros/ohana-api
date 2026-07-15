@@ -11,6 +11,7 @@ import { AuthModule } from './auth/auth.module';
 import { UploadModule } from './upload/upload.module';
 import { MenuSectionsModule } from './menu-sections/menu-sections.module';
 import { MenuModule } from './menu/menu.module';
+import { OffersModule } from './offers/offers.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { MenuModule } from './menu/menu.module';
     UploadModule,
     MenuSectionsModule,
     MenuModule,
+    OffersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
