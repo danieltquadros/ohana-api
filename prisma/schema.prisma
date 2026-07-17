@@ -25,7 +25,7 @@ model Category {
   updatedBy   Int?
   combos      Combo[]
   products    Product[]
-
+  offers      OfferCategory[]
   @@map("categories")
 }
 
@@ -47,6 +47,7 @@ model Combo {
   updatedBy   Int?
   category    Category?      @relation(fields: [categoryId], references: [id])
   products    ComboProduct[]
+  offers      OfferCombo[]
 
   @@map("combos")
 }
@@ -95,6 +96,7 @@ model Product {
   category      Category?                  @relation(fields: [categoryId], references: [id])
   ingredients   ProductIngredient[]
   combos        ComboProduct[]
+  offers        OfferProduct[]
   substitutions ComboProductSubstitution[] @relation("ProductSubstitutions")
 
   @@map("products")
@@ -107,6 +109,7 @@ model ProductType {
   isActive    Boolean      @default(true)
   products    Product[]
   menuSection MenuSection?
+  offers      OfferProductType[]
 
   @@map("product_types")
 }
@@ -157,6 +160,112 @@ model ProductIngredient {
 
   @@unique([productId, ingredientId])
   @@map("product_ingredients")
+}
+
+enum OfferKind {
+  PERCENTAGE
+  FIXED_AMOUNT
+  FIXED_PRICE
+  FREE_SHIPPING
+}
+
+enum OfferScope {
+  PRODUCT
+  COMBO
+  CATEGORY
+  PRODUCT_TYPE
+  CART_TOTAL
+}
+
+enum DayOfWeek {
+  SUN
+  MON
+  TUE
+  WED
+  THU
+  FRI
+  SAT
+}
+
+model Offer{
+  id Int @id @default(autoincrement())
+  label String
+  description String?
+
+  // O que é o desconto
+  kind OfferKind
+  scope OfferScope
+  percentage Decimal? @db.Decimal(5, 2) // Ex: 10.00 para 10%
+  fixedAmount Decimal? @db.Decimal(10, 2) // Ex: 5.00 para R$5 de desconto
+
+  // Pré condições
+  minOrderValue Decimal? @db.Decimal(10, 2) // Só vale se carrinho >= X
+  maxDiscountValue Decimal? @db.Decimal(10, 2) // teto de desconto (para %)
+
+  // Janela temporal
+  validFrom DateTime? // ex: 2026-04-10 00:00 BRT
+  validUntil DateTime? // ex: 2026-04-20 23:59 BRT
+  daysOfWeek DayOfWeek[] // ex: [MON, TUE, WED]
+
+  // Resolução de conflito quando 2+ ofertas aplicáveis
+  priority Int @default(0) // maior prioridade vence
+  stackable Boolean @default(false) // se true, pode combinar com outras ofertas; se false, é exclusiva
+
+  //Estado
+  isActive Boolean @default(true)
+
+  //Audit
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  createdBy Int?
+  updatedBy Int?
+
+  // Targets (M:N com cada tipo de alvo)
+  products OfferProduct[]
+  combos OfferCombo[]
+  categories OfferCategory[]
+  productTypes OfferProductType[]
+
+  @@index([isActive])
+  @@index([validFrom, validUntil])
+  @@map("offers")
+}
+
+// Pivot tables - uma por tipo de target
+model OfferProduct {
+  offerId Int
+  productId Int
+  offer Offer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  @@id([offerId, productId])
+  @@map("offer_products")
+}
+
+model OfferCombo {
+  offerId Int
+  comboId Int
+  offer Offer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  combo Combo @relation(fields: [comboId], references: [id], onDelete: Cascade)
+  @@id([offerId, comboId])
+  @@map("offer_combos")
+}
+
+model OfferCategory {
+  offerId Int
+  categoryId Int
+  offer Offer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  @@id([offerId, categoryId])
+  @@map("offer_categories")
+}
+
+model OfferProductType {
+  offerId Int
+  productTypeId Int
+  offer Offer @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  productType ProductType @relation(fields: [productTypeId], references: [id], onDelete: Cascade)
+  @@id([offerId, productTypeId])
+  @@map("offer_product_types")
 }
 
 enum UserRole {
