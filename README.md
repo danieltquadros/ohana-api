@@ -52,6 +52,52 @@ This backend exposes a REST API for product catalog, authentication, and offer/m
 - ✅ Image upload via Cloudinary
 - ✅ Multi-environment deployment (DEV/PRD)
 
+## 🏛️ Architecture
+
+In commercial production since **July 2025**, serving real customers.
+
+```mermaid
+flowchart TB
+    subgraph Frontends
+        STORE["🛒 ohana_sushi<br/>Next.js 14 · Vercel"]
+        ADMIN["🎛️ ohana-admin<br/>Angular 21 · Vercel"]
+    end
+
+    API["⚙️ ohana-api<br/>NestJS 11 · Render"]
+
+    STORE -->|REST| API
+    ADMIN -->|REST| API
+
+    API --> DB[("PostgreSQL<br/>Neon — DEV/PRD isolated")]
+    API --> CDN["Cloudinary<br/>image storage"]
+
+    CI["GitHub Actions CI/CD"] -.->|auto-deploy| API
+    CI -.->|auto-deploy| STORE
+    CI -.->|auto-deploy| ADMIN
+```
+
+Two fully isolated environments (DEV and PRD) across the entire stack —
+separate databases, API instances, and frontend deployments, promoted
+via Git branches.
+
+## 🧭 Key Decisions
+
+**Aggregated `GET /menu` endpoint** — the storefront renders the full
+menu from a single call. Menu composition rules live in the backend,
+avoiding N+1 requests and keeping business logic out of the client.
+
+**Hierarchical JWT + RBAC (5 levels)** — SUPER_ADMIN → ADMIN → STAFF →
+USER → GUEST. The GUEST level enables sign-up-free checkout identified
+by phone number, removing the biggest friction point in food delivery.
+
+**Zero-downtime schema migration in production** — column drops, new
+table creation, and FK wiring shipped as a single atomic Postgres
+migration, with an idempotent seed script.
+
+**Referential integrity on soft delete** — deleting an entity still
+referenced elsewhere returns HTTP 409 with context, protecting the
+admin from silently breaking the live menu.
+
 ## 🛠️ Tech Stack
 
 - **Framework:** NestJS 11
