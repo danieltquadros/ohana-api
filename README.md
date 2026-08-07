@@ -39,14 +39,14 @@ The full project consists of three integrated applications:
 - ⚙️ **[ohana-api](https://github.com/danieltquadros/ohana-api)** — REST API backend (this repository) — NestJS
 - 🎛️ **[ohana-admin](https://github.com/danieltquadros/ohana-admin)** — Admin panel — Angular
 
-This backend exposes a REST API for product catalog, authentication, and order management.
+This backend exposes a REST API for product catalog, authentication, and offer/menu management.
 
 ### Highlights
 
 - ✅ Clean architecture with dependency injection
 - ✅ Database-first design with Prisma ORM
 - ✅ JWT authentication + RBAC (5 hierarchical levels)
-- ✅ 65+ unit tests (Jest)
+- ✅ 97+ unit tests (Jest)
 - ✅ Automated CI/CD pipeline
 - ✅ Type-safe development with TypeScript
 - ✅ Image upload via Cloudinary
@@ -66,7 +66,6 @@ This backend exposes a REST API for product catalog, authentication, and order m
 
 ## ✨ Features
 
-- 🔐 **Authentication:** JWT with refresh tokens
 - 🛡️ **Authorization:** RBAC with 5 levels (SUPER_ADMIN, ADMIN, STAFF, USER, GUEST)
 - 👤 **GUEST system:** Sign-up-free checkout (phone-based identification)
 - 📦 **Catalog:** Products, customizable combos, ingredients, categories, types
@@ -130,7 +129,7 @@ npm run test:watch   # watch mode
 npm run test:cov     # coverage report
 ```
 
-Currently 65+ unit tests covering services and controllers.
+Currently 97+ unit tests covering services and controllers.
 
 ## 🏗️ Project Structure
 
