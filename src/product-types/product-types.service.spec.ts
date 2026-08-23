@@ -100,9 +100,7 @@ describe('ProductTypesService', () => {
       const createDto = { label: 'Porção' };
       const mockCreatedType = { id: 3, name: 'PORCAO', label: 'Porção' };
 
-      jest
-        .spyOn(prisma.productType, 'findUnique')
-        .mockResolvedValue(null);
+      jest.spyOn(prisma.productType, 'findUnique').mockResolvedValue(null);
       jest
         .spyOn(prisma.productType, 'create')
         .mockResolvedValue(mockCreatedType as any);
