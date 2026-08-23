@@ -319,7 +319,6 @@ Checklist completo (✅ Concluído em 23/02/2026):
 ### Backend PRD
 
 - **API:** https://ohana-api-prd.onrender.com/api
-- **GraphQL:** https://ohana-api-prd.onrender.com/graphql
 - **Render Dashboard:** https://dashboard.render.com
 
 ### Frontend PRD

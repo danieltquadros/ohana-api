@@ -8,14 +8,14 @@
 
 - ✅ NestJS 11 + TypeScript
 - ✅ PostgreSQL + Prisma ORM (adapter-pg)
-- ✅ GraphQL (Apollo Server) + REST API
+- ✅ REST API
 - ✅ ESLint + Prettier + Husky
 - ✅ GitHub Actions CI/CD
 
 **Módulos CRUD:**
 
 - ✅ Products, Product Types, Categories, Ingredients, Combos
-- ✅ REST + GraphQL completos
+- ✅ REST completos
 
 **Testes:**
 
@@ -301,7 +301,6 @@ npx ts-node prisma/seed.ts
 
 - [x] Acessar: `https://ohana-api-dev-a7kk.onrender.com/api/products`
 - [x] Verificar se retorna JSON com produtos
-- [x] Testar GraphQL: `https://ohana-api-dev-a7kk.onrender.com/graphql`
 
 ---
 
@@ -532,7 +531,6 @@ npx tsx prisma/seed.ts
 - [ ] Acessar: `https://ohana-api-prod-[hash].onrender.com/api/products`
 - [ ] Verificar JSON com 25 produtos
 - [ ] Testar endpoint de health: `/api/ping` ou similar
-- [ ] **Apollo Sandbox deve estar desabilitado** (NODE_ENV=production) ✅
 
 **4.3.5 - Custom Domain PRD (Opcional - Futuro):**
 
@@ -616,7 +614,6 @@ npx tsx prisma/seed.ts
   - [x] Listagem de produtos ✅ (25 produtos do Backend PRD)
   - [x] Frontend renderizando corretamente
   - [x] Requisições para `ohana-api-prd.onrender.com/api/products`
-  - [x] Apollo Sandbox desabilitado (NODE_ENV=production)
 - [x] Performance validada (latência aceitável)
 - [x] Console do navegador sem erros
 
