@@ -213,6 +213,10 @@ docs/                # Technical documentation
 - **Database:** Neon PostgreSQL (DEV + PRD isolated)
 - **Monitoring:** UptimeRobot (scheduled via GitHub Actions for Free Tier optimization)
 
-## 📄 License
+## License
 
-MIT
+Copyright © 2025–2026 Daniel Teixeira Quadros. All rights reserved.
+
+This source code is publicly available for reading and portfolio
+evaluation purposes only. No permission is granted to use, copy,
+modify, or distribute this software, in whole or in part.
