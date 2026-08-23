@@ -5,7 +5,6 @@
 [![Prisma](https://img.shields.io/badge/Prisma-7-2D3748?logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 > REST API for the Ohana Sushi delivery system.
 > Built with NestJS, Prisma 7, and PostgreSQL.
@@ -213,6 +212,10 @@ docs/                # Technical documentation
 - **Database:** Neon PostgreSQL (DEV + PRD isolated)
 - **Monitoring:** UptimeRobot (scheduled via GitHub Actions for Free Tier optimization)
 
-## 📄 License
+## License
 
-MIT
+Copyright © 2025–2026 Daniel Teixeira Quadros. All rights reserved.
+
+This source code is publicly available for reading and portfolio
+evaluation purposes only. No permission is granted to use, copy,
+modify, or distribute this software, in whole or in part.

@@ -57,7 +57,12 @@ describe('MenuService', () => {
         productType: { id: 10, name: 'TEMAKI', label: 'Temakis' },
       };
       const combo = { id: 100, name: 'Combo 1', price: 50, isActive: true };
-      const product = { id: 200, title: 'Temaki Salmão', price: 20, isActive: true };
+      const product = {
+        id: 200,
+        title: 'Temaki Salmão',
+        price: 20,
+        isActive: true,
+      };
 
       mockPrismaService.menuSection.findMany.mockResolvedValue([
         sectionCombos,
